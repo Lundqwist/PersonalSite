@@ -1,0 +1,47 @@
+@*
+    Areas/Admin/Views/Shared/_MediaLibrary.cshtml — the "Images" section of the
+    editors: upload, drag-and-drop, and a grid of all uploaded images.
+
+    Model: a tuple (list of images, whether to show the "Cover" button).
+    The post editor shows it; the About editor doesn't (no cover image there).
+
+    The buttons and uploading are handled by wwwroot/js/admin-editor.js.
+    Each image's data-* attributes (data-id, data-url, ...) give the
+    JavaScript what it needs, e.g. the address to insert into the text.
+*@
+@model (List<MediaListItem> Images, bool AllowCover)
+<section class="media-library" aria-labelledby="media-heading" data-allow-cover="@(Model.AllowCover ? "true" : "false")">
+    <div class="media-library-head">
+        <h2 id="media-heading">Images</h2>
+        @* The real file picker is visually hidden; the styled <label> below
+           opens it when clicked (a label "for" an input activates that input).
+           accept="image/*" shows only images; multiple allows several at once. *@
+        <input type="file" id="media-file" accept="image/*" multiple class="visually-hidden media-file-input" />
+        <label class="btn btn-small" for="media-file">Upload images</label>
+    </div>
+    <div class="media-drop" id="media-drop">
+        Drop images here, or use <strong>Upload images</strong>. They are resized to max 1600 px.
+        Use <strong>Insert</strong> to place an image in the text.
+    </div>
+    @* aria-live="polite": screen readers read out changes here ("Image uploaded.") *@
+    <p class="media-status" id="media-status" role="status" aria-live="polite"></p>
+    <ul class="media-grid" id="media-grid">
+        @foreach (var img in Model.Images)
+        {
+            <li class="media-item" data-id="@img.Id" data-url="@img.Url" data-thumb="@img.ThumbUrl" data-alt="@img.AltText">
+                <img src="@img.ThumbUrl" alt="@img.AltText" loading="lazy" />
+                <span class="media-name" title="@img.FileName">@img.FileName</span>
+                <div class="media-actions">
+                    <button type="button" class="btn btn-small" data-media="insert">Insert</button>
+                    @if (Model.AllowCover)
+                    {
+                        <button type="button" class="btn btn-small" data-media="cover">Cover</button>
+                    }
+                    <button type="button" class="btn btn-small btn-danger" data-media="delete" aria-label="Delete image @img.FileName">✕</button>
+                </div>
+            </li>
+        }
+    </ul>
+    @* "hidden" when there are images; JavaScript shows/hides it as images are added or deleted *@
+    <p class="admin-empty" id="media-empty" @(Model.Images.Count > 0 ? "hidden" : "")>No images uploaded yet.</p>
+</section>

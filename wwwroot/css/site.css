@@ -1,0 +1,1743 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   wwwroot/css/site.css — all styling for the site (public pages and admin).
+
+   CSS BASICS USED IN THIS FILE
+   • A rule = selector { property: value; }
+       .cv-card { ... }        applies to elements with class="cv-card"
+       .cv-card:hover { ... }  ...while the mouse is over it
+       .a .b { ... }           elements with class b INSIDE an element with class a
+   • Custom properties ("CSS variables"): defined like  --bg: #EC8F2E;  and used
+     like  background: var(--bg);  Change a color once here and it changes
+     everywhere. They are defined in :root (= the whole page) just below.
+   • Variables are inherited: an element can REDEFINE a variable for itself and
+     everything inside it. This file uses that trick for the boxes ("cards"):
+     inside a card, --text becomes the card's text color, so all the rules
+     using var(--text) automatically pick the right color (see "Cards" below).
+   • The cascade: when two rules set the same property, the more specific
+     selector wins; if equally specific, the one LATER in the file wins.
+   • Units: rem = relative to the base font size (1rem = 16px here);
+     vw = % of the window width; clamp(min, preferred, max) keeps a size
+     between two limits.
+   • Layout: "display: flex" lines items up in a row or column;
+     "display: grid" places them in rows AND columns.
+   • @media (max-width: 600px) { ... }  = rules that only apply on narrow
+     screens (phones). They are collected at the end of the file.
+   • BEM-style names: .post-card is a block, .post-card-thumb a part of it,
+     .post-card--image a variant of it.
+
+   ORDER OF THIS FILE
+   Colors (tokens) → reset → header → hero (front page) → page headers → CV →
+   stories/projects/portfolio → footer → admin (buttons, forms, editor) →
+   responsive (phone/tablet) rules → card frame (kept last on purpose).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens ─────────────────────────────────────────── */
+/* "Tokens" = the named colors and sizes everything else uses.
+   Orange page (#EC8F2E) with its complementary deep blue for text and accents.
+   Cards ("squares") are a lighter orange with a 3px dark orange frame; the
+   header and small pills stay deep blue. Contrast (WCAG AA): page text 7.1:1,
+   page muted/accent 5.6:1; card text 9.6:1, card muted 7.3:1, card accent
+   7.5:1; frame vs page 3:1. White text on orange is below 3:1, so all text
+   on orange is dark. (WCAG AA = the common accessibility standard: normal
+   text needs at least 4.5:1 contrast against its background.) */
+:root {
+    /* Page (orange) */
+    --bg:        #EC8F2E;
+    --border:    rgba(10, 26, 47, 0.28);
+    --text:      #0A1A2F;
+    --text-muted:#1B2E47;
+    --accent:    #0E2D57;
+    --accent-lt: #071B36;
+    --accent-ink:#FFFFFF;   /* text on accent-colored buttons */
+
+    /* Surfaces (deep blue) */
+    --bg2:       #0A1F3A;
+    --bg3:       #0C2443;
+    --surface:   #102A4C;
+    --surface2:  #1A3A63;
+    --field-bg:  #0A1F3A;
+    --surface-border:    #24466F;
+    --on-surface:        #EAF1FA;
+    --on-surface-muted:  #A9BCD6;
+    --surface-accent:    #F29A3A;
+    --surface-accent-lt: #FFB866;
+    --surface-accent-ink:#1A1406;
+
+    /* Cards ("squares"): lighter orange fill, dark orange frame, side shadow */
+    --card-bg:           #F6B264;
+    --card-bg2:          #FAC98F;   /* panels inside cards: notes, table head, toolbar */
+    --card-field:        #FFF5E8;   /* form fields */
+    --card-text:         #0A1A2F;
+    --card-text-muted:   #2B2F38;
+    --card-divider:      rgba(138, 64, 4, 0.35);
+    --card-error:        #8E1A1A;
+    --card-border:       #8A4004;
+    --card-border-hover: #5E2B02;
+    --card-shadow:       6px 8px 18px rgba(92, 42, 0, 0.38);
+    --card-shadow-hover: 10px 14px 28px rgba(92, 42, 0, 0.45);
+
+    --current:   #3a8c5a;
+    --radius:    14px;
+    --card-h:    160px;
+    --comment-h: 120px;
+}
+
+/* ── Reset ───────────────────────────────────────────── */
+/* Browsers add their own margins and paddings; remove them so the page looks
+   the same everywhere. box-sizing: border-box makes "width" include padding
+   and border, which makes sizes much easier to reason about.
+   "*" = every element; ::before/::after = generated content (see .hn-card). */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* Elements drawn on deep blue: switch text, accent and border colors so
+   every rule inside them stays readable. */
+.cv-count,
+.lang-switch,
+.prose pre {
+    --text: var(--on-surface);
+    --text-muted: var(--on-surface-muted);
+    --accent: var(--surface-accent);
+    --accent-lt: var(--surface-accent-lt);
+    --accent-ink: var(--surface-accent-ink);
+    --border: var(--surface-border);
+    color: var(--text);
+}
+
+/* Cards ("squares") and the menu bar: light orange with dark text.
+   Re-pointing the panel and field tokens here restyles everything inside them
+   (notes panel, tables, editor toolbar, inputs, buttons) without touching
+   each rule. */
+.site-header,
+.site-footer,
+.hn-card,
+.cv-card,
+.post-card,
+.admin-card,
+.admin-table-wrap {
+    --text: var(--card-text);
+    --text-muted: var(--card-text-muted);
+    --accent: #0E2D57;
+    --accent-lt: #071B36;
+    --accent-ink: #FFFFFF;
+    --border: var(--card-divider);
+    --surface: var(--card-bg);
+    --surface2: var(--card-bg2);
+    --bg2: var(--card-bg2);
+    --bg3: var(--card-bg2);
+    --field-bg: var(--card-field);
+    --on-surface: var(--card-text);
+    --surface-border: var(--card-divider);
+    color: var(--text);
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    /* Same look as the cards: light orange, dark orange edge, side shadow */
+    background: var(--card-bg);
+    border-bottom: 3px solid var(--card-border);
+    box-shadow: 0 6px 16px rgba(92, 42, 0, 0.3);
+}
+
+.nav-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.nav-brand {
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1;
+}
+
+.nav-links {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.nav-links a {
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.2s, background 0.2s;
+    letter-spacing: 0.02em;
+}
+
+.nav-links a {
+    border: 2px solid transparent;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--text);
+    background: var(--surface2);
+}
+
+.nav-links a.active {
+    color: var(--accent);
+    font-weight: 600;
+    border-color: var(--card-border);
+}
+
+.nav-links a:focus-visible,
+.nav-brand:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ── Main ────────────────────────────────────────────── */
+.site-main { flex: 1; }
+
+/* ── Hero ────────────────────────────────────────────── */
+.hero {
+    min-height: 48vh;
+    display: flex;
+    align-items: center;
+    padding: 5rem 2rem 3rem;
+    background: radial-gradient(ellipse 60% 55% at 70% 40%, rgba(255, 214, 160, 0.35) 0%, transparent 70%);
+}
+
+.hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    /* Same side padding as the box grid below, so text and portrait line up with it */
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 3rem;
+}
+
+/* Portrait next to the welcome text, framed like the boxes */
+.hero-portrait {
+    width: clamp(220px, 26vw, 300px);
+    aspect-ratio: 3 / 4;
+    border: 3px solid var(--card-border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    background: var(--card-bg);
+}
+
+.hero-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Framed image next to a page headline (e.g. Stories), same frame as the boxes */
+.framed-image {
+    border: 3px solid var(--card-border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    background: var(--card-bg);
+}
+
+.framed-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.framed-image--square { aspect-ratio: 1 / 1; }
+.framed-image--wide { aspect-ratio: 3 / 2; }
+.framed-image--landscape { aspect-ratio: 6 / 5; }
+
+/* Language switch placed under a headline (About page) */
+.page-header-switch { margin-top: 1.25rem; }
+
+.page-header-image {
+    width: clamp(160px, 22vw, 260px);
+    flex-shrink: 0;
+}
+
+.page-header-image--wide {
+    width: clamp(220px, 32vw, 380px);
+}
+
+/* Site address on portfolio cards */
+.post-card-site {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--accent);
+}
+
+/* "Visit site" button on a portfolio item */
+.post-visit {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.post-visit-host {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.page-header--with-actions:has(.page-header-image) {
+    align-items: center;
+}
+
+.hero-eyebrow {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+}
+
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+
+.hero-title em {
+    font-style: italic;
+    color: var(--accent);
+}
+
+.hero-sub {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    max-width: 480px;
+    font-weight: 300;
+}
+
+/* ── Home nav grid ───────────────────────────────────── */
+.home-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 2rem 6rem;
+}
+
+.hn-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.75rem;
+    transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ::before creates an extra invisible layer inside the card (content: ''),
+   used for a soft light glow that fades in on hover (opacity 0 -> 1). */
+.hn-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.28), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.hn-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--card-border-hover);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.hn-card:hover::before { opacity: 1; }
+
+.hn-icon {
+    font-size: 1.5rem;
+    color: var(--accent);
+}
+
+.hn-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.hn-card p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    flex: 1;
+}
+
+.hn-arrow {
+    font-size: 1.25rem;
+    color: var(--accent);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.25s, transform 0.25s;
+    align-self: flex-end;
+}
+
+.hn-card:hover .hn-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ── Page header ─────────────────────────────────────── */
+.page-header {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem 2rem;
+}
+
+.page-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+}
+
+.page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* ── CV Sections ─────────────────────────────────────── */
+.cv-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 2rem 3rem;
+}
+
+.cv-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.cv-section-icon {
+    font-size: 1.25rem;
+    color: var(--accent);
+}
+
+.cv-section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    flex: 1;
+}
+
+.cv-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--surface2);
+    color: var(--text-muted);
+    border-radius: 20px;
+    padding: 0.2rem 0.7rem;
+    letter-spacing: 0.04em;
+}
+
+/* ── CV Card grid ────────────────────────────────────── */
+.cv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    /* Only the hovered card grows when its notes open */
+    align-items: start;
+}
+
+/* ── CV Card with hover-reveal comment ───────────────── */
+.cv-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* Fixed height; comment slides in from bottom */
+    position: relative;
+    cursor: default;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.cv-card:hover {
+    border-color: var(--card-border-hover);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.cv-card--current {
+    border-color: var(--card-border);
+}
+
+.cv-card--current:hover {
+    border-color: var(--card-border-hover);
+}
+
+.cv-card-main {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+}
+
+.cv-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.cv-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+}
+
+.cv-card-org {
+    font-size: 0.875rem;
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.cv-badge {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #E3F6EA;
+    color: #0F4D2A;
+    border: 1px solid #3a8c5a;
+    border-radius: 20px;
+    padding: 0.2rem 0.65rem;
+    white-space: nowrap;
+}
+
+.cv-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+}
+
+.cv-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.cv-meta-item svg { flex-shrink: 0; }
+
+/* ── Comment panel — slides in on hover ──────────────── */
+/* The notes panel is closed with max-height: 0 and opened on hover by giving
+   it a large max-height. "transition" animates the change, so it slides open.
+   (Animating to "height: auto" isn't possible in CSS, hence max-height.) */
+.cv-card-comment {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.35s ease;
+    opacity: 0;
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+}
+
+.cv-card:hover .cv-card-comment {
+    max-height: 700px;
+    opacity: 1;
+}
+
+.cv-comment-inner {
+    padding: 1rem 1.5rem;
+}
+
+.cv-comment-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+.cv-comment-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.cv-course-list {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.cv-course-list li {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.cv-course-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+}
+
+.cv-course-list:last-child { margin-bottom: 0; }
+
+/* ── Language switch ─────────────────────────────────── */
+.page-header--with-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.lang-switch {
+    display: inline-flex;
+    padding: 0.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+}
+
+.lang-switch a {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.lang-switch a:hover { color: var(--text); }
+
+.lang-switch a.active {
+    background: var(--surface2);
+    color: var(--accent-lt);
+}
+
+.lang-switch a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ── Empty pages ─────────────────────────────────────── */
+.empty-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 2rem;
+}
+
+.empty-inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--accent);
+    opacity: 0.5;
+}
+
+.empty-inner h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+}
+
+.empty-inner p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+.empty-page--compact { min-height: 30vh; }
+
+/* Hides text visually but keeps it readable for screen readers
+   (display: none would hide it from them too). Used e.g. for "In English". */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ── Stories & Projects ──────────────────────────────── */
+.post-list {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem 2rem 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.post-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.post-card:hover,
+.post-card:focus-visible {
+    border-color: var(--card-border-hover);
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.post-card time,
+.post-article time {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.post-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.post-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.post-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+/* SE / EN tag on posts (white on deep blue, 13.7:1) */
+.lang-tag {
+    display: inline-block;
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    background: #0E2D57;
+    color: #FFFFFF;
+}
+
+.post-card-more {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--accent);
+}
+
+.post-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+}
+
+.post-article--page { padding-top: 0; }
+
+.post-article-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.post-back {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.post-back:hover { color: var(--accent); }
+
+.post-article h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0.4rem 0 1rem;
+}
+
+.post-lead {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 2rem;
+}
+
+.post-body {
+    font-size: 1.02rem;
+    line-height: 1.8;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* Formatted (Markdown) text */
+.prose { white-space: normal; }
+.prose > * + * { margin-top: 1.1em; }
+.prose h1, .prose h2, .prose h3, .prose h4 {
+    font-family: 'Playfair Display', serif;
+    line-height: 1.25;
+    margin-top: 1.8em;
+}
+.prose h1 { font-size: 1.9rem; }
+.prose h2 { font-size: 1.55rem; }
+.prose h3 { font-size: 1.25rem; }
+.prose h4 { font-size: 1.05rem; }
+.prose > :first-child { margin-top: 0; }
+.prose a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { color: var(--accent-lt); }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li + li { margin-top: 0.3em; }
+.prose li::marker { color: var(--accent); }
+.prose blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 0.2em 0 0.2em 1.2em;
+    color: var(--text-muted);
+    font-style: italic;
+}
+.prose code {
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    font-size: 0.88em;
+    background: rgba(10, 26, 47, 0.12);
+    padding: 0.15em 0.4em;
+    border-radius: 5px;
+}
+.prose pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    line-height: 1.55;
+}
+.prose pre code { background: none; padding: 0; }
+.prose img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin: 1.6em auto;
+}
+.prose hr { border: none; border-top: 1px solid var(--border); margin: 2.2em 0; }
+.prose table { width: 100%; border-collapse: collapse; font-size: 0.92rem; display: block; overflow-x: auto; }
+.prose th, .prose td { border: 1px solid var(--border); padding: 0.5em 0.8em; text-align: left; }
+.prose th { background: rgba(10, 26, 47, 0.1); }
+
+.post-cover {
+    margin: 0 0 2.5rem;
+}
+
+.post-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 520px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+/* Thumbnail on list cards */
+.post-card--image { padding-top: 0; overflow: hidden; }
+
+.post-card-thumb {
+    margin: 0 -1.5rem 0.5rem;
+    aspect-ratio: 16 / 9;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.post-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.post-card:hover .post-card-thumb img { transform: scale(1.03); }
+
+.post-link { margin-top: 2rem; }
+
+.post-link a {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.post-link a:hover { color: var(--accent-lt); }
+
+/* ── Admin ───────────────────────────────────────────── */
+.nav-links a.nav-admin:not(.active) {
+    border-style: dashed;
+    border-color: var(--card-divider);
+}
+
+.admin-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 5rem;
+}
+
+.admin-header { margin-bottom: 2rem; }
+
+.admin-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+}
+
+.admin-header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-tabs a {
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.admin-tabs a:hover { color: var(--text); }
+
+.admin-tabs a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.admin-message {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: #E3F6EA;
+    border: 1px solid #3a8c5a;
+    color: #0F4D2A;
+    font-size: 0.9rem;
+}
+
+.admin-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.admin-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.admin-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.75rem;
+    transition: border-color 0.25s;
+}
+
+.admin-tile:hover,
+.admin-tile:focus-visible { border-color: var(--card-border-hover); }
+
+.admin-tile h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+}
+
+.admin-tile p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.admin-section { margin-bottom: 2.5rem; }
+
+.admin-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin-section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.admin-empty {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.admin-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.7rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.admin-table th {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg2);
+}
+
+.admin-table tbody tr:last-child td { border-bottom: none; }
+.admin-table tbody tr:hover { background: var(--bg2); }
+.admin-table .num { text-align: right; width: 3rem; font-variant-numeric: tabular-nums; }
+.admin-table .nowrap { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.admin-row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+
+.status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+}
+
+.status--published {
+    color: #0F4D2A;
+    background: #E3F6EA;
+}
+
+.status--draft {
+    color: var(--text-muted);
+    background: var(--surface2);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    border: 1px solid var(--surface-border);
+    background: var(--surface2);
+    color: var(--on-surface);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn:hover { border-color: var(--accent); }
+
+.btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+}
+
+.btn-primary:hover {
+    background: var(--accent-lt);
+    border-color: var(--accent-lt);
+}
+
+.btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.btn-small {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+}
+
+.btn-danger:hover {
+    border-color: var(--card-error);
+    color: var(--card-error);
+}
+
+/* Forms */
+.admin-login {
+    display: flex;
+    justify-content: center;
+    padding: 4rem 1rem;
+}
+
+.admin-login .admin-form { width: 100%; max-width: 380px; }
+
+.admin-login h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 2rem;
+}
+
+.admin-form--narrow { max-width: 480px; }
+
+.form-langs {
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-lang-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.form-lang-head small {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.form-row--3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.form-field label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.form-field input:not([type="checkbox"]),
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    background: var(--field-bg);
+    border: 1px solid #A85A12;   /* 4.7:1 against the field, so inputs are easy to spot */
+    border-radius: 8px;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9rem;
+    color-scheme: light;
+}
+
+.form-field textarea {
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(14, 45, 87, 0.25);
+}
+
+.form-field--check {
+    justify-content: flex-end;
+}
+
+.form-field--check label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    cursor: pointer;
+}
+
+.form-field--check input {
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: var(--accent);
+}
+
+.form-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.form-error {
+    font-size: 0.8rem;
+    color: var(--card-error);
+}
+
+.form-error ul { list-style: none; }
+.validation-summary-valid { display: none; }
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Post language choice (SE / EN) */
+.lang-choice {
+    border: none;
+}
+
+.lang-choice legend { margin-bottom: 0.35rem; }
+
+.lang-choice-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.lang-choice-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--field-bg);
+    border: 1px solid #A85A12;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.lang-choice-options label:has(input:checked) {
+    border: 2px solid var(--accent);
+    padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+    font-weight: 600;
+}
+
+.lang-choice-options input {
+    accent-color: var(--accent);
+}
+
+.lang-choice-options label:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Markdown editor */
+.md-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.25rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.md-toolbar button {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.md-toolbar button:hover { color: var(--text); background: var(--surface2); }
+
+.md-toolbar button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.md-toolbar-spacer { flex: 1; }
+
+.md-toolbar .md-tab.active {
+    color: var(--accent);
+    border-color: var(--border);
+    background: var(--surface);
+}
+
+.md-field .md-input {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    font-size: 0.85rem !important;
+}
+
+.md-preview {
+    min-height: 20rem;
+    max-height: 40rem;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--field-bg);
+    border: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+    font-size: 0.95rem;
+}
+
+.md-help {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.md-help summary { cursor: pointer; color: var(--accent); width: fit-content; }
+.md-help table { margin-top: 0.75rem; border-collapse: collapse; }
+.md-help td { padding: 0.25rem 1.25rem 0.25rem 0; }
+.md-help code {
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    background: var(--surface2);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    color: var(--text);
+}
+
+/* Cover image picker */
+.cover-picker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.75rem;
+    background: var(--field-bg);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+}
+
+.cover-picker img {
+    width: 160px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cover-picker-empty {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+[hidden] { display: none !important; }
+
+/* Image library */
+.media-library {
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.media-library-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.media-library-head h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+}
+
+.media-file-input:focus-visible + label {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.media-drop {
+    padding: 1.25rem;
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.media-drop.dragging {
+    border-color: var(--accent);
+    background: rgba(14, 45, 87, 0.08);
+}
+
+.media-status {
+    font-size: 0.85rem;
+    color: var(--accent-lt);
+    min-height: 1.2em;
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.media-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem;
+}
+
+.media-item img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 6px;
+    background: var(--field-bg);
+}
+
+.media-name {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.media-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.media-actions .btn { flex: 1; padding: 0.25rem 0.3rem; }
+.media-actions .btn-danger { flex: 0 0 auto; }
+
+/* ── Footer ──────────────────────────────────────────── */
+/* Same look as the menu bar: light orange, dark orange edge, soft shadow */
+.site-footer {
+    margin-top: 2rem;
+    background: var(--card-bg);
+    border-top: 3px solid var(--card-border);
+    box-shadow: 0 -6px 16px rgba(92, 42, 0, 0.22);
+}
+
+.footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 2rem;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.3fr;
+    gap: 2rem 3rem;
+}
+
+.footer-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.footer-heading {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.9rem;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.footer-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text);
+    width: fit-content;
+}
+
+.footer-item address { font-style: normal; }
+
+.footer-icon {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    color: var(--accent);
+}
+
+a.footer-item {
+    border-radius: 6px;
+    transition: color 0.2s;
+}
+
+a.footer-item:hover span {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+a.footer-item:focus-visible,
+.footer-copy:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.footer-copy {
+    margin-left: 0.25rem;
+    padding: 0.1rem 0.55rem;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--card-bg2);
+    border: 1px solid var(--card-divider);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.footer-copy:hover { border-color: var(--accent); }
+
+.footer-bottom {
+    /* Line and text aligned with the columns above */
+    width: min(calc(1100px - 4rem), calc(100% - 4rem));
+    margin: 0 auto;
+    padding: 1rem 0 1.5rem;
+    border-top: 1px solid var(--card-divider);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 900px) {
+    .footer-inner {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-brand { grid-column: 1 / -1; }
+
+    .home-nav-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .home-nav-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cv-grid,
+    .post-list {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row,
+    .form-row--3,
+    .form-lang-head {
+        grid-template-columns: 1fr;
+    }
+
+    .form-lang-head span:last-child { display: none; }
+
+    .admin-page,
+    .post-article,
+    .post-list {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .admin-form { padding: 1.25rem; }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    /* Phones: footer in one column */
+    .footer-inner {
+        grid-template-columns: 1fr;
+        padding: 2rem 1rem 1.5rem;
+    }
+
+    .footer-bottom { width: calc(100% - 2rem); }
+
+    /* Phones: compact menu so all links fit */
+    .nav-container {
+        padding: 0.5rem 1rem;
+        gap: 0.75rem;
+        height: auto;
+        min-height: 60px;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        row-gap: 0.25rem;
+    }
+
+    .nav-links a {
+        padding: 0.4rem 0.55rem;
+        font-size: 0.8rem;
+    }
+
+    /* Phones: portrait above the text, aligned with the boxes */
+    .hero {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .hero-inner {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+        gap: 2rem;
+    }
+
+    .hero-portrait {
+        order: -1;
+        width: 180px;
+    }
+}
+
+
+/* ── Card frame ──────────────────────────────────────── */
+/* Every box on the orange page gets a darker orange border and a shadow
+   falling to the lower right. Kept last so it applies to all of them;
+   hover rules above still change the border and lift the shadow.
+   (Why that works: ".cv-card:hover" is MORE specific than ".cv-card", so it
+   wins even though it comes earlier in the file — see the cascade note at
+   the top.) */
+.hn-card,
+.cv-card,
+.post-card,
+.admin-card,
+.admin-table-wrap {
+    background: var(--card-bg);
+    border: 3px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+}

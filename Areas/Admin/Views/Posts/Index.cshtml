@@ -1,0 +1,71 @@
+@*
+    Areas/Admin/Views/Posts/Index.cshtml — admin list of stories, projects or portfolio
+    items (the category comes from ViewData). Each row: date, language, title,
+    status (Published/Draft) and Edit/Delete buttons.
+*@
+@model List<Post>
+@{
+    var category = (PostCategory)ViewData["Category"]!;
+    var label = category.AdminLabel();
+    var publicController = category.Controller();
+    ViewData["Title"] = $"Admin · {label}";
+}
+
+<div class="admin-page">
+    <partial name="_AdminHeader" model="@label" />
+
+    <section class="admin-section">
+        <div class="admin-section-header">
+            <h2>@label <span class="cv-count">@Model.Count</span></h2>
+            <a class="btn btn-primary" asp-action="Create" asp-route-category="@category">+ New @category.AdminNoun()</a>
+        </div>
+
+        @if (Model.Count == 0)
+        {
+            <p class="admin-empty">Nothing here yet.</p>
+        }
+        else
+        {
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Lang.</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Status</th>
+                            <th scope="col"><span class="visually-hidden">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr>
+                                <td class="nowrap">@p.PublishedDate.ToString("yyyy-MM-dd")</td>
+                                <td><span class="lang-tag">@p.LanguageLabel</span></td>
+                                <td lang="@p.Language">@p.Title</td>
+                                <td>
+                                    @if (p.IsPublished)
+                                    {
+                                        <a class="status status--published" asp-area="" asp-controller="@publicController" asp-action="Details" asp-route-id="@p.Id">Published</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="status status--draft">Draft</span>
+                                    }
+                                </td>
+                                <td class="admin-row-actions">
+                                    <a class="btn btn-small" asp-action="Edit" asp-route-id="@p.Id">Edit</a>
+                                    <form method="post" asp-action="Delete" asp-route-id="@p.Id"
+                                          onsubmit="return confirm('Delete this post? This cannot be undone.');">
+                                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

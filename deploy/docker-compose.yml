@@ -1,0 +1,39 @@
+# ════════════════════════════════════════════════════════════════════════════
+# deploy/docker-compose.yml — runs the site on the Synology NAS with Container Manager.
+#
+# Lives on the NAS in  /volume1/docker/personalsite/  next to:
+#   app/    the published site (copied there by deploy.ps1)
+#   keys/   encryption keys for login cookies (created automatically)
+#   .env    the database connection string (secret, see .env.example)
+#
+# It uses Microsoft's official .NET 8 runtime image, so no image has to be
+# built: the container just runs the published PersonalSite.dll from app/.
+# ════════════════════════════════════════════════════════════════════════════
+
+services:
+  personalsite:
+    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    container_name: personalsite
+    # Start again automatically after a crash or a NAS restart
+    restart: unless-stopped
+    # Use the NAS's own network. The site then reaches the database at
+    # 192.168.50.2 like any machine on the LAN, and DSM's reverse proxy
+    # reaches the site at localhost:8090.
+    network_mode: host
+    working_dir: /app
+    command: ["dotnet", "PersonalSite.dll"]
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # Listen only on the NAS itself; visitors come in through the reverse proxy (HTTPS)
+      - ASPNETCORE_URLS=http://127.0.0.1:8090
+      # Plain-http requests are redirected to https on port 443
+      - ASPNETCORE_HTTPS_PORT=443
+      # The database connection string, read from the .env file
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION}
+      # Keep the cookie encryption keys outside the container (survive restarts)
+      - DataProtection__KeysPath=/keys
+      - TZ=Europe/Stockholm
+    volumes:
+      # The published site, read-only inside the container
+      - ./app:/app:ro
+      - ./keys:/keys

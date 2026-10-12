@@ -1,0 +1,125 @@
+@*
+    Areas/Admin/Views/Cv/Edit.cshtml — the form for adding OR editing a CV entry.
+    A new entry has Id 0, so the form posts to Create; otherwise to Edit/{id}.
+    Swedish fields on the left, English on the right (optional; empty = use Swedish).
+*@
+@model CvEntry
+@{
+    var isNew = Model.Id == 0;
+    var heading = isNew ? "Add CV entry" : "Edit CV entry";
+    ViewData["Title"] = $"Admin · {heading}";
+}
+
+<div class="admin-page">
+    <partial name="_AdminHeader" model="@heading" />
+
+    <form method="post" asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? null : Model.Id)" class="admin-form admin-card">
+        <div asp-validation-summary="ModelOnly" class="form-error" role="alert"></div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label asp-for="Type">Section</label>
+                <select asp-for="Type">
+                    <option value="Workplace">Workplaces</option>
+                    <option value="Course">Courses</option>
+                    <option value="School">Education</option>
+                    <option value="Board">Boards &amp; Committees</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label asp-for="SortOrder">Order in section</label>
+                <input asp-for="SortOrder" type="number" min="0" />
+                <span class="form-hint">1 is shown first.</span>
+            </div>
+        </div>
+
+        <fieldset class="form-langs">
+            <legend class="visually-hidden">Text</legend>
+            <div class="form-lang-head"><span>Svenska</span><span>English <small>(optional, falls back to Swedish)</small></span></div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label asp-for="Title">Title</label>
+                    <input asp-for="Title" required />
+                    <span asp-validation-for="Title" class="form-error"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="TitleEn">Title (English)</label>
+                    <input asp-for="TitleEn" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label asp-for="Organization">Organization</label>
+                    <input asp-for="Organization" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="OrganizationEn">Organization (English)</label>
+                    <input asp-for="OrganizationEn" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label asp-for="Location">Location</label>
+                    <input asp-for="Location" />
+                </div>
+                <div class="form-field">
+                    <label asp-for="LocationEn">Location (English)</label>
+                    <input asp-for="LocationEn" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label asp-for="Courses">Courses (one per line)</label>
+                    <textarea asp-for="Courses" rows="5"></textarea>
+                    <span class="form-hint">Shown as a bullet list.</span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="CoursesEn">Courses (English, one per line)</label>
+                    <textarea asp-for="CoursesEn" rows="5"></textarea>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label asp-for="Comment">Notes</label>
+                    <textarea asp-for="Comment" rows="6"></textarea>
+                </div>
+                <div class="form-field">
+                    <label asp-for="CommentEn">Notes (English)</label>
+                    <textarea asp-for="CommentEn" rows="6"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="form-row form-row--3">
+            <div class="form-field">
+                <label asp-for="StartDate">Start date</label>
+                @* type="date" shows the browser's date picker. It needs the value
+                   as 2022-08-01, so asp-format sets that format regardless of language. *@
+                <input asp-for="StartDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div class="form-field">
+                <label asp-for="EndDate">End date</label>
+                <input asp-for="EndDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div class="form-field form-field--check">
+                <label><input asp-for="IsCurrent" /> Ongoing</label>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label asp-for="DisplayDate">Date text (optional)</label>
+            <input asp-for="DisplayDate" />
+            <span class="form-hint">Shown instead of the dates, e.g. "1992 – 1994" or "1999-10-16".</span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">@(isNew ? "Add" : "Save")</button>
+            <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

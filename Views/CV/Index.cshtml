@@ -1,0 +1,149 @@
+@*
+    Views/CV/Index.cshtml — the public CV page.
+
+    The controller (Controllers/CvController.cs) passes a Dictionary that maps
+    each section (Workplace, Course, School, Board) to its list of entries.
+    "@model" declares that type, so "Model" below is that dictionary.
+
+    Each entry becomes a card. Courses and notes are in a panel that slides
+    open when you hover over the card (done purely in CSS, see .cv-card-comment
+    in site.css).
+*@
+@using System.Globalization
+@model Dictionary<CvEntryType, List<CvEntry>>
+@{
+    // true when the visitor has chosen English
+    var en = Lang.IsEnglish;
+
+    // Short alias so the view can write T("Svenska", "English")
+    string T(string sv, string english) => Lang.T(sv, english);
+
+    ViewData["Title"] = "CV";
+
+    // "aug. 2022" in Swedish, "Aug 2022" in English: the month format follows
+    // the current language (CultureInfo.CurrentCulture). "—" when there is no date.
+    string FormatDate(DateOnly? date)
+    {
+        if (date == null) return "—";
+        return date.Value.ToString("MMM yyyy", CultureInfo.CurrentCulture);
+    }
+
+    // "Aug 2022 – Jun 2024", or the free text in DisplayDate when it is set
+    // (e.g. "1992 – 1994"), or "... – Present" for ongoing entries.
+    string FormatDateRange(CvEntry e)
+    {
+        if (!string.IsNullOrWhiteSpace(e.DisplayDate)) return e.DisplayDate;
+        var start = FormatDate(e.StartDate);
+        var end = e.IsCurrent ? T("pågående", "Present") : FormatDate(e.EndDate);
+        return $"{start} – {end}";
+    }
+
+    // The sections in display order: (type, heading, icon).
+    // Each item is a "tuple" — a small group of values without a named class.
+    var sections = new[]
+    {
+        (CvEntryType.Workplace, T("Arbetsplatser", "Workplaces"),            "◈"),
+        (CvEntryType.Course,    T("Kurser", "Courses"),                      "◇"),
+        (CvEntryType.School,    T("Utbildningar", "Education"),              "◆"),
+        (CvEntryType.Board,     T("Styrelser & kommittéer", "Boards & Committees"), "◉"),
+    };
+}
+
+<div class="page-header page-header--with-actions">
+    <div>
+        <p class="page-eyebrow">Portfolio</p>
+        <h1>Curriculum Vitae</h1>
+    </div>
+    @* The Svenska | English switch (Views/Shared/_LangSwitch.cshtml) *@
+    <partial name="_LangSwitch" />
+</div>
+
+@* Loop over the sections. "var (type, label, icon)" unpacks each tuple
+   into three variables ("deconstruction"). *@
+@foreach (var (type, label, icon) in sections)
+{
+    // Skip sections without entries
+    if (!Model.ContainsKey(type)) continue;
+    var entries = Model[type];
+
+    <section class="cv-section">
+        <div class="cv-section-header">
+            <span class="cv-section-icon" aria-hidden="true">@icon</span>
+            <h2>@label</h2>
+            <span class="cv-count">@entries.Count</span>
+        </div>
+
+        <div class="cv-grid">
+            @foreach (var entry in entries)
+            {
+                // Pick the Swedish or English text once per card (see CvEntry.cs)
+                var organization = entry.GetOrganization(en);
+                var location = entry.GetLocation(en);
+                var courses = entry.GetCourses(en);
+                var comment = entry.GetComment(en);
+
+                @* The extra class "cv-card--current" is added only for ongoing entries *@
+                <div class="cv-card @(entry.IsCurrent ? "cv-card--current" : "")">
+                    <div class="cv-card-main">
+                        <div class="cv-card-top">
+                            <div>
+                                <h3 class="cv-card-title">@entry.GetTitle(en)</h3>
+                                @if (!string.IsNullOrWhiteSpace(organization))
+                                {
+                                    <p class="cv-card-org">@organization</p>
+                                }
+                            </div>
+                            @if (entry.IsCurrent)
+                            {
+                                <span class="cv-badge">@T("Pågående", "Current")</span>
+                            }
+                        </div>
+                        <div class="cv-card-meta">
+                            @if (!string.IsNullOrWhiteSpace(location))
+                            {
+                                <span class="cv-meta-item">
+                                    @* Small inline SVG icon (a map pin). aria-hidden: decorative, skipped by screen readers *@
+                                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    @location
+                                </span>
+                            }
+                            <span class="cv-meta-item">
+                                @* Calendar icon *@
+                                <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                @FormatDateRange(entry)
+                            </span>
+                        </div>
+                    </div>
+
+                    @* The hover panel, only when there is something to show *@
+                    @if (courses.Length > 0 || !string.IsNullOrWhiteSpace(comment))
+                    {
+                        <div class="cv-card-comment">
+                            <div class="cv-comment-inner">
+                                @if (courses.Length > 0)
+                                {
+                                    @* "Courses taught" for jobs, "Courses" for education *@
+                                    <p class="cv-comment-label">
+                                        @(entry.Type == CvEntryType.Workplace ? T("Undervisade kurser", "Courses taught") : T("Kurser", "Courses"))
+                                    </p>
+                                    <ul class="cv-course-list">
+                                        @foreach (var course in courses)
+                                        {
+                                            <li>@course</li>
+                                        }
+                                    </ul>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(comment))
+                                {
+                                    <p class="cv-comment-label">@T("Anteckningar", "Notes")</p>
+                                    @* Line breaks in the notes are kept by CSS (white-space: pre-line) *@
+                                    <p class="cv-comment-text">@comment</p>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+}

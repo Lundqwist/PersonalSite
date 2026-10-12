@@ -1,0 +1,120 @@
+@*
+    Areas/Admin/Views/Posts/Edit.cshtml — the editor for a story, project or
+    portfolio item (new or existing). Contains:
+      • language (SE/EN), date and Published checkbox
+      • cover image picker (filled by the image library's Cover button)
+      • title, summary and the Markdown text with toolbar (_MarkdownField)
+      • link / website address
+      • the image library (_MediaLibrary)
+    The interactive parts are driven by wwwroot/js/admin-editor.js, loaded in the
+    Scripts section at the bottom. data-upload-url etc. on the <form> tell that
+    script which addresses to call.
+*@
+@model Post
+@{
+    var isNew = Model.Id == 0;
+    var noun = Model.Category.AdminNoun();
+    var isPortfolio = Model.Category == PostCategory.Portfolio;
+    var heading = isNew ? $"New {noun}" : $"Edit {noun}";
+    ViewData["Title"] = $"Admin · {heading}";
+    ViewData["Category"] = Model.Category;
+    var images = ViewData["Images"] as List<MediaListItem> ?? new();
+    var cover = images.FirstOrDefault(i => i.Id == Model.CoverImageId);
+}
+
+<div class="admin-page">
+    <partial name="_AdminHeader" model="@heading" />
+
+    <form method="post"
+          asp-action="@(isNew ? "Create" : "Edit")"
+          asp-route-id="@(isNew ? null : Model.Id)"
+          asp-route-category="@(isNew ? Model.Category.ToString() : null)"
+          class="admin-form admin-card"
+          id="post-form"
+          data-editor
+          data-upload-url="@Url.Action("Upload", "Media", new { area = "Admin" })"
+          data-delete-url="@Url.Action("Delete", "Media", new { area = "Admin" })"
+          data-preview-url="@Url.Action("Preview", "Posts", new { area = "Admin" })">
+        <div asp-validation-summary="ModelOnly" class="form-error" role="alert"></div>
+
+        <div class="form-row form-row--3">
+            @* Radio buttons with the same name ("Language") form a group where
+               only one can be chosen. The chosen value ("sv"/"en") is sent as
+               Language. A <fieldset> + <legend> groups them for screen readers. *@
+            <fieldset class="form-field lang-choice">
+                <legend class="form-label">Language of this @noun</legend>
+                <div class="lang-choice-options">
+                    <label><input type="radio" name="Language" value="@Post.Swedish" checked="@(!Model.IsEnglish)" /> <span class="lang-tag">SE</span> Svenska</label>
+                    <label><input type="radio" name="Language" value="@Post.English" checked="@Model.IsEnglish" /> <span class="lang-tag">EN</span> English</label>
+                </div>
+                <span asp-validation-for="Language" class="form-error"></span>
+            </fieldset>
+            <div class="form-field">
+                <label asp-for="PublishedDate">Date</label>
+                <input asp-for="PublishedDate" type="date" asp-format="{0:yyyy-MM-dd}" required />
+            </div>
+            <div class="form-field form-field--check">
+                <label><input asp-for="IsPublished" /> Published (visible on the site)</label>
+            </div>
+        </div>
+
+        @* Cover image — thumbnail in lists, header image on the post page *@
+        <div class="form-field">
+            <span class="form-label">Cover image</span>
+            @* The chosen cover's image number is kept in this hidden field and
+               sent with the form. The "Cover"/"Remove cover" buttons change it
+               with JavaScript (setCover in admin-editor.js). *@
+            <input type="hidden" asp-for="CoverImageId" id="cover-image-id" />
+            <div class="cover-picker" id="cover-picker" data-empty="@(cover == null ? "true" : "false")">
+                <img id="cover-preview" src="@(cover?.ThumbUrl)" alt="" @(cover == null ? "hidden" : "") />
+                <p class="cover-picker-empty" @(cover != null ? "hidden" : "")>
+                    No cover chosen — the first image in the text is used as thumbnail.
+                    Choose one with <strong>Cover</strong> in the image library below.
+                </p>
+                <button type="button" class="btn btn-small btn-ghost" id="cover-remove" @(cover == null ? "hidden" : "")>Remove cover</button>
+            </div>
+            <span asp-validation-for="CoverImageId" class="form-error"></span>
+        </div>
+
+        <fieldset class="form-langs">
+            <legend class="visually-hidden">Text</legend>
+
+            <div class="form-field">
+                <label asp-for="Title">Title</label>
+                <input asp-for="Title" required />
+                <span asp-validation-for="Title" class="form-error"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="Summary">Summary</label>
+                <textarea asp-for="Summary" rows="3"></textarea>
+                <span class="form-hint">Shown in the list. Max 500 characters.</span>
+                <span asp-validation-for="Summary" class="form-error"></span>
+            </div>
+
+            <partial name="_MarkdownField" model="@(("Body", "Text", Model.Body))" />
+            <partial name="_FormattingHelp" />
+        </fieldset>
+
+        <div class="form-field">
+            <label asp-for="Url">@(isPortfolio ? "Website address" : "Link (optional)")</label>
+            <input asp-for="Url" type="url" placeholder="https://" />
+            <span class="form-hint">@(isPortfolio
+                ? "The site this item showcases. Shown on the card and as a \"Visit site\" button."
+                : "For example a GitHub repository or a demo.")</span>
+            <span asp-validation-for="Url" class="form-error"></span>
+        </div>
+
+        <partial name="_MediaLibrary" model="@((images, true))" />
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">@(isNew ? "Add" : "Save")</button>
+            <a class="btn btn-ghost" asp-action="Index" asp-route-category="@Model.Category">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@* Adds admin-editor.js at the bottom of the page (where _Layout calls RenderSectionAsync("Scripts")) *@
+@section Scripts {
+    <script src="~/js/admin-editor.js" asp-append-version="true"></script>
+}

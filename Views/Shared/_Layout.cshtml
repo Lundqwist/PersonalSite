@@ -1,0 +1,83 @@
+@*
+    ═══════════════════════════════════════════════════════════════════════════
+    Views/Shared/_Layout.cshtml — the frame around EVERY page: <head>, the menu
+    bar, the footer and the scripts. Each page's own content is inserted where
+    @RenderBody() is.
+
+    RAZOR CRASH COURSE (.cshtml = HTML with C# mixed in):
+      @ * ... * @          (written without the spaces) a Razor comment, like this
+                           one; never sent to the browser
+      @Something           outputs a C# value into the HTML (safely "HTML-encoded",
+                           so text like <script> is shown as text, not run)
+      @{ ... }             a block of C# code
+      @if / @foreach       C# control flow around HTML
+      asp-controller="X"   a "tag helper": ASP.NET Core builds the correct link
+      asp-action="Y"       (href="/X/Y") for you, so links don't break if
+                           routes change
+      ~/css/site.css       "~" = the wwwroot folder
+    ═══════════════════════════════════════════════════════════════════════════
+*@
+@{
+    // A small local function: returns "active" (a CSS class that highlights the
+    // menu link) when we are on that public page, otherwise "".
+    // It ignores admin pages, where e.g. the admin About editor would otherwise
+    // light up "About". RouteData holds the current area/controller/action.
+    string ActiveIf(string controller) =>
+        string.IsNullOrEmpty(ViewContext.RouteData.Values["area"]?.ToString())
+        && string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), controller, StringComparison.OrdinalIgnoreCase)
+            ? "active" : "";
+}
+<!DOCTYPE html>
+@* lang="sv" or "en" helps screen readers pronounce the text correctly *@
+<html lang="@Lang.Code">
+<head>
+    <meta charset="utf-8" />
+    @* Makes the page fit phone screens instead of showing a zoomed-out desktop page *@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @* Colors the browser's address bar on phones *@
+    <meta name="theme-color" content="#EC8F2E" />
+    @* Each page sets ViewData["Title"]; it appears in the browser tab *@
+    <title>@ViewData["Title"] — Personal</title>
+    @* Fonts from Google Fonts: Playfair Display (headings) and Inter (text) *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    @* asp-append-version adds ?v=<hash> to the address, so browsers fetch the
+       new file whenever site.css changes instead of using an old cached copy *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-container">
+            @* asp-area="" keeps these links on the public site, also from admin pages *@
+            <a class="nav-brand" asp-area="" asp-controller="Home" asp-action="Index" aria-label="Home">⬡</a>
+            <ul class="nav-links">
+                <li><a asp-area="" asp-controller="CV" asp-action="Index" class="@ActiveIf("CV")">CV</a></li>
+                <li><a asp-area="" asp-controller="Stories" asp-action="Index" class="@ActiveIf("Stories")">Stories</a></li>
+                <li><a asp-area="" asp-controller="Projects" asp-action="Index" class="@ActiveIf("Projects")">Projects</a></li>
+                <li><a asp-area="" asp-controller="Portfolio" asp-action="Index" class="@ActiveIf("Portfolio")">Portfolio</a></li>
+                <li><a asp-area="" asp-controller="About" asp-action="Index" class="@ActiveIf("About")">About</a></li>
+                @* The Admin link is only shown when you are logged in.
+                   "User" is the current visitor, read from the login cookie. *@
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-admin @(ViewContext.RouteData.Values["area"]?.ToString() == "Admin" ? "active" : "")">Admin</a></li>
+                }
+            </ul>
+        </nav>
+    </header>
+
+    <main class="site-main">
+        @* The current page's own .cshtml content goes here *@
+        @RenderBody()
+    </main>
+
+    @* <partial> inserts another view: Views/Shared/_Footer.cshtml *@
+    <partial name="_Footer" />
+
+    @* Scripts at the end of <body> so the page content shows first *@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @* Pages can add their own scripts with  @section Scripts { ... }
+       (the admin editors use this for admin-editor.js) *@
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

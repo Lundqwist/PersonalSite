@@ -1,0 +1,44 @@
+@*
+    Areas/Admin/Views/Shared/_AdminHeader.cshtml — top of every admin page:
+    the heading, "Change password" / "Log out", the admin tabs and the green
+    "saved" message. Used as  <partial name="_AdminHeader" model="@("Heading")" />
+    so the Model here is just the heading text (a string).
+*@
+@model string
+@{
+    // Which admin page are we on? Used to highlight the right tab.
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var postCategory = ViewData["Category"]?.ToString();
+    string Active(bool isActive) => isActive ? "active" : "";
+}
+<div class="admin-header">
+    <div class="admin-header-top">
+        <div>
+            <p class="page-eyebrow">Admin · @User.Identity?.Name</p>
+            <h1>@Model</h1>
+        </div>
+        <div class="admin-header-actions">
+            <a class="btn btn-ghost" asp-area="Admin" asp-controller="Account" asp-action="ChangePassword">Change password</a>
+            @* Log out is a small form (POST), not a link. The form tag helper
+               automatically adds the hidden antiforgery token. *@
+            <form method="post" asp-area="Admin" asp-controller="Account" asp-action="Logout">
+                <button type="submit" class="btn btn-ghost">Log out</button>
+            </form>
+        </div>
+    </div>
+    <nav class="admin-tabs" aria-label="Admin sections">
+        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="@Active(controller == "Dashboard")">Overview</a>
+        <a asp-area="Admin" asp-controller="Cv" asp-action="Index" class="@Active(controller == "Cv")">CV</a>
+        <a asp-area="Admin" asp-controller="Posts" asp-action="Index" asp-route-category="Story" class="@Active(controller == "Posts" && postCategory == "Story")">Stories</a>
+        <a asp-area="Admin" asp-controller="Posts" asp-action="Index" asp-route-category="Project" class="@Active(controller == "Posts" && postCategory == "Project")">Projects</a>
+        <a asp-area="Admin" asp-controller="Posts" asp-action="Index" asp-route-category="Portfolio" class="@Active(controller == "Posts" && postCategory == "Portfolio")">Portfolio</a>
+        <a asp-area="Admin" asp-controller="About" asp-action="Index" class="@Active(controller == "About")">About</a>
+    </nav>
+    @* The message set by SetMessage(...) in the controller before redirecting.
+       "is string message" checks that it exists and names it "message".
+       role="status" makes screen readers announce it. *@
+    @if (TempData["AdminMessage"] is string message)
+    {
+        <p class="admin-message" role="status">@message</p>
+    }
+</div>

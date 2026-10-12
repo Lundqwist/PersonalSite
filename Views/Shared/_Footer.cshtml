@@ -1,0 +1,80 @@
+@*
+    Views/Shared/_Footer.cshtml — the footer with contact information,
+    included on every page by _Layout.cshtml.
+
+    The icons are inline SVG: small vector drawings written directly in the
+    HTML. The "d" attribute of <path> is a list of drawing commands
+    (M = move to, l = line to, c = curve, z = close shape...).
+    fill="currentColor" makes the icon use the text color from the CSS.
+    aria-hidden="true" hides the decorative icons from screen readers; the
+    visually-hidden spans say "Email:", "LinkedIn:" etc. for them instead.
+
+    Icons: Bootstrap Icons 1.11.3 (https://icons.getbootstrap.com),
+    © 2019-2024 The Bootstrap Authors, MIT License.
+*@
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <p class="footer-name">Bjarne M. Lundqwist</p>
+        </div>
+
+        @* aria-labelledby links the section to its heading, for screen readers.
+           <address> is the HTML element meant for contact information. *@
+        <section class="footer-col" aria-labelledby="footer-address-heading">
+            <h2 class="footer-heading" id="footer-address-heading">@Lang.T("Adress", "Address")</h2>
+            <div class="footer-item">
+                <svg class="footer-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
+                    <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                </svg>
+                <address>
+                    Bjarne M. Lundqwist<br />
+                    Gustavsbergsgatan 6B<br />
+                    571 33 Nässjö<br />
+                    @Lang.T("Sverige", "Sweden")
+                </address>
+            </div>
+        </section>
+
+        <section class="footer-col" aria-labelledby="footer-contact-heading">
+            <h2 class="footer-heading" id="footer-contact-heading">@Lang.T("Kontakt", "Contact")</h2>
+            <ul class="footer-links">
+                <li>
+                    @* "mailto:" links open the visitor's email program *@
+                    <a class="footer-item" href="mailto:bjarne@lundqwist.se">
+                        <svg class="footer-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
+                        </svg>
+                        <span><span class="visually-hidden">@Lang.T("E-post:", "Email:") </span>bjarne@lundqwist.se</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="footer-item" href="https://www.linkedin.com/in/lundqwist" target="_blank" rel="noopener noreferrer">
+                        <svg class="footer-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z" />
+                        </svg>
+                        <span><span class="visually-hidden">LinkedIn: </span>linkedin.com/in/lundqwist</span>
+                    </a>
+                </li>
+                <li>
+                    @* Discord has no public profile link for usernames, so the name can be copied instead.
+                       The button's data-copy / data-copied-text attributes are read by wwwroot/js/site.js. *@
+                    <div class="footer-item">
+                        <svg class="footer-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612" />
+                        </svg>
+                        <span><span class="visually-hidden">Discord: </span>Lundqwist</span>
+                        <button type="button" class="footer-copy" data-copy="Lundqwist"
+                                data-copied-text="@Lang.T("Kopierat!", "Copied!")"
+                                aria-label="@Lang.T("Kopiera Discord-namnet", "Copy Discord username")">@Lang.T("Kopiera", "Copy")</button>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <div class="footer-bottom">
+        @* &copy; is the HTML code for the © sign. The year updates automatically. *@
+        <span>&copy; @DateTime.Now.Year Bjarne M. Lundqwist. @Lang.T("Alla rättigheter förbehållna.", "All rights reserved.")</span>
+    </div>
+</footer>

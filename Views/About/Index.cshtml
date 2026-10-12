@@ -1,0 +1,53 @@
+@*
+    Views/About/Index.cshtml — the public About page.
+    The text is written on /Admin/About in Markdown and converted to HTML here.
+*@
+@using PersonalSite.Services
+@* The model may be null ("?") when no About text has been saved yet *@
+@model PageContent?
+@* @inject asks dependency injection for a service, like a constructor
+   parameter in a controller. Here: the Markdown converter. *@
+@inject MarkdownRenderer Markdown
+@{
+    // English is the main text; Swedish is shown when chosen and filled in
+    var en = Lang.IsEnglish;
+    var title = Model?.GetTitle(en);
+    var body = Model?.GetBody(en);
+    // Which language the shown text is actually in (for the lang attribute)
+    var contentLang = !en && !string.IsNullOrWhiteSpace(Model?.BodySv) ? "sv" : "en";
+    ViewData["Title"] = Lang.T("Om mig", "About");
+}
+
+<div class="page-header page-header--with-actions">
+    <div>
+        <p class="page-eyebrow">@Lang.T("Om mig", "About")</p>
+        @* Use the saved heading, or a default when none is written *@
+        <h1>@(string.IsNullOrWhiteSpace(title) ? Lang.T("Om mig", "About me") : title)</h1>
+        @* The About text exists in both languages, so it keeps its switch *@
+        <div class="page-header-switch">
+            <partial name="_LangSwitch" />
+        </div>
+    </div>
+    @* Framed image to the right of the headline (styles: .framed-image in site.css) *@
+    <figure class="framed-image framed-image--landscape page-header-image page-header-image--wide">
+        <img src="~/images/about.jpg" asp-append-version="true" width="760" height="633"
+             alt="@Lang.T("Bjarne med en kopp kaffe vid ett tält på klipporna, med solnedgång över havet", "Bjarne with a cup of coffee by a tent on the rocks, with the sun setting over the sea")" />
+    </figure>
+</div>
+
+@if (string.IsNullOrWhiteSpace(body))
+{
+    <div class="empty-page empty-page--compact">
+        <div class="empty-inner">
+            <span class="empty-icon" aria-hidden="true">◉</span>
+            <p>@Lang.T("Kommer snart.", "Coming soon.")</p>
+        </div>
+    </div>
+}
+else
+{
+    <article class="post-article post-article--page">
+        @* Markdown.Render returns safe, already-cleaned HTML (see MarkdownRenderer.cs) *@
+        <div class="post-body prose" lang="@contentLang">@Markdown.Render(body)</div>
+    </article>
+}

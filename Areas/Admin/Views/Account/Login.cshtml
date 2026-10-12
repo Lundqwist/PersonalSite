@@ -1,0 +1,45 @@
+@*
+    Areas/Admin/Views/Account/Login.cshtml — the admin login form (/Admin/Account/Login).
+
+    FORM TAG HELPERS used here:
+      <form asp-action="Login">       builds action="/Admin/Account/Login" and adds
+                                      the hidden antiforgery token automatically
+      <input asp-for="UserName" />    builds an input named after the model property,
+                                      with the right type and current value
+      <label asp-for="UserName" />    the label text from [Display(Name = ...)]
+      asp-validation-for="..."        shows that field's error message, if any
+      asp-validation-summary          shows general errors ("Wrong username or password.")
+*@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Admin login";
+}
+
+<div class="admin-login">
+    <form method="post" asp-action="Login" class="admin-form admin-card">
+        <p class="page-eyebrow">Admin</p>
+        <h1>Log in</h1>
+
+        @* role="alert" makes screen readers announce errors immediately *@
+        <div asp-validation-summary="ModelOnly" class="form-error" role="alert"></div>
+
+        @* Remembers which admin page to return to after logging in *@
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="form-field">
+            <label asp-for="UserName"></label>
+            @* autocomplete helps password managers fill in the right fields *@
+            <input asp-for="UserName" autocomplete="username" autofocus />
+            <span asp-validation-for="UserName" class="form-error"></span>
+        </div>
+
+        <div class="form-field">
+            <label asp-for="Password"></label>
+            @* type="password" comes from [DataType(DataType.Password)] on the model *@
+            <input asp-for="Password" autocomplete="current-password" />
+            <span asp-validation-for="Password" class="form-error"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Log in</button>
+    </form>
+</div>

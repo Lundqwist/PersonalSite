@@ -1,0 +1,32 @@
+﻿<!--
+  PersonalSite.csproj — the project file. It tells .NET how to build the site:
+  which .NET version to use and which libraries ("NuGet packages") to download.
+  "dotnet restore" downloads the packages; "dotnet build" compiles the code.
+-->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- .NET 8 (long-term support version) -->
+    <TargetFramework>net8.0</TargetFramework>
+    <!-- Warn when a value that may be null is used without checking (the "?" types) -->
+    <Nullable>enable</Nullable>
+    <!-- Common "using" lines (System, System.Linq, ...) are added automatically -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>PersonalSite</RootNamespace>
+    <UserSecretsId>e729a9e0-2350-419f-bf9d-dde4c90f2c73</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Cleans HTML so only safe tags remain (used by MarkdownRenderer) — MIT license -->
+    <PackageReference Include="HtmlSanitizer" Version="9.2.1039" />
+    <!-- Converts Markdown text to HTML — BSD-2-Clause license -->
+    <PackageReference Include="Markdig" Version="1.4.0" />
+    <!-- Lets Entity Framework Core talk to MySQL/MariaDB — MIT license -->
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
+    <!-- Tools for creating migrations ("dotnet ef migrations add ...") -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2" />
+    <!-- Entity Framework Core: work with the database through C# classes -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+  </ItemGroup>
+
+</Project>

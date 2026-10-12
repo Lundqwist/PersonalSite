@@ -1,0 +1,29 @@
+# .gitignore — files Git should never store in the repository.
+
+# Build output (recreated by "dotnet build" / "dotnet publish").
+# These folders also contain copies of the settings files.
+bin/
+obj/
+publish/
+
+# Visual Studio / VS Code / Rider user files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Secrets: the real .env with the database password only lives on the NAS
+.env
+deploy/.env
+
+# The CV document contains private contact details (phone number) and is not
+# needed by the site (the CV content lives in the database)
+Data/*.pdf
+
+# Local settings overrides, if you create any
+appsettings.*.local.json
+
+# OS files
+Thumbs.db
+.DS_Store

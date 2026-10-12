@@ -1,0 +1,60 @@
+@*
+    Views/Home/Index.cshtml — the front page (shown by HomeController.Index).
+    Two parts: the "hero" (welcome text + portrait) and the grid of five boxes
+    linking to the other pages. All styling is in wwwroot/css/site.css.
+*@
+@{
+    // Text for the browser tab, used by _Layout.cshtml
+    ViewData["Title"] = "Home";
+}
+
+@* ── Hero: welcome text on the left, portrait on the right ── *@
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-text">
+            <p class="hero-eyebrow">Welcome</p>
+            <h1 class="hero-title">A place for<br><em>ideas & work</em></h1>
+            <p class="hero-sub">Explore my experience, writing, and projects below.</p>
+        </div>
+        @* alt = description for screen readers. width/height let the browser
+           reserve space before the image loads (no jumping layout).
+           fetchpriority="high" loads it early since it's at the top. *@
+        <figure class="hero-portrait">
+            <img src="~/images/portrait.jpg" asp-append-version="true" alt="Portrait of Bjarne Lundqwist" width="720" height="960" fetchpriority="high" />
+        </figure>
+    </div>
+</section>
+
+@* ── Five boxes linking to the sections. The whole box is a link (<a>). ── *@
+<section class="home-nav-grid">
+    <a class="hn-card" asp-controller="CV" asp-action="Index">
+        <span class="hn-icon">◈</span>
+        <h2>CV</h2>
+        <p>Professional background, education, and board roles</p>
+        <span class="hn-arrow">→</span>
+    </a>
+    <a class="hn-card" asp-controller="Stories" asp-action="Index">
+        <span class="hn-icon">◇</span>
+        <h2>Stories</h2>
+        <p>Thoughts, essays, and things worth sharing</p>
+        <span class="hn-arrow">→</span>
+    </a>
+    <a class="hn-card" asp-controller="Projects" asp-action="Index">
+        <span class="hn-icon">◆</span>
+        <h2>Projects</h2>
+        <p>Side projects, open source, and experiments</p>
+        <span class="hn-arrow">→</span>
+    </a>
+    <a class="hn-card" asp-controller="Portfolio" asp-action="Index">
+        <span class="hn-icon">▣</span>
+        <h2>Portfolio</h2>
+        <p>Websites and work I have built</p>
+        <span class="hn-arrow">→</span>
+    </a>
+    <a class="hn-card" asp-controller="About" asp-action="Index">
+        <span class="hn-icon">◉</span>
+        <h2>About</h2>
+        <p>Who I am and what drives me</p>
+        <span class="hn-arrow">→</span>
+    </a>
+</section>

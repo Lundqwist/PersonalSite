@@ -1,0 +1,13 @@
+@*
+    Views/Shared/_LangTag.cshtml — the small SE / EN tag on a post.
+    Used as <partial name="_LangTag" model="post" />, so Model is that post.
+
+    Sighted visitors see "SE"/"EN" (aria-hidden hides it from screen readers);
+    screen readers instead hear the full words from the visually-hidden span
+    ("In Swedish"/"In English"), which is invisible on screen.
+*@
+@model Post
+<span class="lang-tag" title="@(Model.IsEnglish ? Lang.T("På engelska", "In English") : Lang.T("På svenska", "In Swedish"))">
+    <span aria-hidden="true">@Model.LanguageLabel</span>
+    <span class="visually-hidden">@(Model.IsEnglish ? Lang.T("På engelska", "In English") : Lang.T("På svenska", "In Swedish"))</span>
+</span>

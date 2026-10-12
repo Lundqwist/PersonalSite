@@ -1,0 +1,44 @@
+@*
+    Areas/Admin/Views/Dashboard/Index.cshtml — the admin overview (/Admin):
+    one tile per section with a count. The counts come from DashboardController
+    through ViewData.
+*@
+@{
+    ViewData["Title"] = "Admin";
+    var aboutUpdated = ViewData["AboutUpdated"] as DateTime?;
+    // "1 post" / "3 posts": picks the singular or plural word.
+    // ViewData values are stored as "object", so (int) converts back to a number.
+    string Count(object? n, string one, string many) => $"{n} {((int)(n ?? 0) == 1 ? one : many)}";
+}
+
+<div class="admin-page">
+    <partial name="_AdminHeader" model="@("Overview")" />
+
+    <div class="admin-dashboard">
+        <a class="admin-card admin-tile" asp-controller="Cv" asp-action="Index">
+            <span class="hn-icon">◈</span>
+            <h2>CV</h2>
+            <p>@Count(ViewData["CvCount"], "entry", "entries")</p>
+        </a>
+        <a class="admin-card admin-tile" asp-controller="Posts" asp-action="Index" asp-route-category="Story">
+            <span class="hn-icon">◇</span>
+            <h2>Stories</h2>
+            <p>@Count(ViewData["StoryCount"], "post", "posts")</p>
+        </a>
+        <a class="admin-card admin-tile" asp-controller="Posts" asp-action="Index" asp-route-category="Project">
+            <span class="hn-icon">◆</span>
+            <h2>Projects</h2>
+            <p>@Count(ViewData["ProjectCount"], "post", "posts")</p>
+        </a>
+        <a class="admin-card admin-tile" asp-controller="Posts" asp-action="Index" asp-route-category="Portfolio">
+            <span class="hn-icon">▣</span>
+            <h2>Portfolio</h2>
+            <p>@Count(ViewData["PortfolioCount"], "item", "items")</p>
+        </a>
+        <a class="admin-card admin-tile" asp-controller="About" asp-action="Index">
+            <span class="hn-icon">◉</span>
+            <h2>About</h2>
+            <p>@(aboutUpdated.HasValue ? $"Updated {aboutUpdated.Value.ToLocalTime():yyyy-MM-dd}" : "Not written yet")</p>
+        </a>
+    </div>
+</div>

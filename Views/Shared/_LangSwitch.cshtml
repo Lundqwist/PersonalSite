@@ -1,0 +1,22 @@
+@*
+    Views/Shared/_LangSwitch.cshtml — the "Svenska | English" switch.
+
+    A "partial view": a piece of HTML reused on several pages with
+    <partial name="_LangSwitch" />. Each link goes to LanguageController.Set,
+    which saves the choice in a cookie and returns to this page (returnUrl).
+*@
+@{
+    var en = Lang.IsEnglish;
+    // The current address, e.g. "/CV" — so we can come back here afterwards
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+@* aria-label names the menu for screen readers; aria-current marks the
+   active language. When an attribute's value is null, Razor leaves the
+   attribute out completely. *@
+<nav class="lang-switch" aria-label="@Lang.T("Språk", "Language")">
+    @* asp-route-culture / asp-route-returnUrl become ?culture=sv-SE&returnUrl=... *@
+    <a asp-controller="Language" asp-action="Set" asp-area="" asp-route-culture="sv-SE" asp-route-returnUrl="@returnUrl"
+       class="@(en ? "" : "active")" hreflang="sv" lang="sv" aria-current="@(en ? null : "true")">Svenska</a>
+    <a asp-controller="Language" asp-action="Set" asp-area="" asp-route-culture="en-US" asp-route-returnUrl="@returnUrl"
+       class="@(en ? "active" : "")" hreflang="en" lang="en" aria-current="@(en ? "true" : null)">English</a>
+</nav>

@@ -1,0 +1,37 @@
+@*
+    Areas/Admin/Views/Shared/_MarkdownField.cshtml — a text area for Markdown
+    with a formatting toolbar and a Write/Preview switch.
+
+    Used as <partial name="_MarkdownField" model="@(("Body", "Text", Model.Body))" />
+    The model is a tuple: (field name, label text, current value).
+
+    This file only creates the HTML. The buttons work through
+    wwwroot/js/admin-editor.js, which finds them by their data-* attributes:
+      data-md="bold"        which formatting the button applies
+      data-md-tab="preview" switches between writing and previewing
+      data-target="Body"    which text area the toolbar belongs to
+*@
+@model (string Name, string Label, string? Value)
+<div class="form-field md-field">
+    <label for="@Model.Name">@Model.Label</label>
+    @* role="toolbar" and aria-label describe the button group to screen readers.
+       type="button" stops the buttons from submitting the form. *@
+    <div class="md-toolbar" role="toolbar" aria-label="Formatting for @Model.Label" data-target="@Model.Name">
+        <button type="button" data-md="bold" title="Bold (Ctrl+B)" aria-label="Bold"><strong>B</strong></button>
+        <button type="button" data-md="italic" title="Italic (Ctrl+I)" aria-label="Italic"><em>I</em></button>
+        <button type="button" data-md="heading" title="Heading" aria-label="Heading">H</button>
+        <button type="button" data-md="ul" title="Bullet list" aria-label="Bullet list">•</button>
+        <button type="button" data-md="ol" title="Numbered list" aria-label="Numbered list">1.</button>
+        <button type="button" data-md="quote" title="Quote" aria-label="Quote">❝</button>
+        <button type="button" data-md="link" title="Link (Ctrl+K)" aria-label="Link">🔗</button>
+        <button type="button" data-md="code" title="Code" aria-label="Code">&lt;/&gt;</button>
+        <span class="md-toolbar-spacer"></span>
+        @* aria-pressed tells screen readers which tab is active *@
+        <button type="button" class="md-tab active" data-md-tab="write" aria-pressed="true">Write</button>
+        <button type="button" class="md-tab" data-md-tab="preview" aria-pressed="false">Preview</button>
+    </div>
+    @* name="Body" is what the controller reads when the form is saved *@
+    <textarea id="@Model.Name" name="@Model.Name" rows="18" class="md-input">@Model.Value</textarea>
+    @* Filled by JavaScript with the rendered preview; "hidden" until Preview is clicked *@
+    <div class="md-preview post-body prose" hidden></div>
+</div>

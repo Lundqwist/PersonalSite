@@ -1,0 +1,78 @@
+@*
+    Areas/Admin/Views/Cv/Index.cshtml — admin list of all CV entries, one table per
+    section, with Edit and Delete buttons. Model = all entries (from Admin/CvController.Index).
+*@
+@model List<CvEntry>
+@{
+    ViewData["Title"] = "Admin · CV";
+
+    var sections = new[]
+    {
+        (CvEntryType.Workplace, "Workplaces"),
+        (CvEntryType.Course,    "Courses"),
+        (CvEntryType.School,    "Education"),
+        (CvEntryType.Board,     "Boards & Committees"),
+    };
+
+    string DateText(CvEntry e) =>
+        !string.IsNullOrWhiteSpace(e.DisplayDate) ? e.DisplayDate
+        : $"{e.StartDate:yyyy-MM} – {(e.IsCurrent ? "now" : e.EndDate?.ToString("yyyy-MM") ?? "")}";
+}
+
+<div class="admin-page">
+    <partial name="_AdminHeader" model="@("CV")" />
+
+    @foreach (var (type, label) in sections)
+    {
+        var entries = Model.Where(e => e.Type == type).ToList();
+
+        <section class="admin-section">
+            <div class="admin-section-header">
+                <h2>@label <span class="cv-count">@entries.Count</span></h2>
+                <a class="btn btn-primary" asp-action="Create" asp-route-type="@type">+ Add</a>
+            </div>
+
+            @if (entries.Count == 0)
+            {
+                <p class="admin-empty">No entries.</p>
+            }
+            else
+            {
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="num">#</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Organization</th>
+                                <th scope="col">Dates</th>
+                                <th scope="col"><span class="visually-hidden">Actions</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var e in entries)
+                            {
+                                <tr>
+                                    <td class="num">@e.SortOrder</td>
+                                    <td>@e.Title</td>
+                                    <td>@e.Organization</td>
+                                    <td class="nowrap">@DateText(e)</td>
+                                    <td class="admin-row-actions">
+                                        <a class="btn btn-small" asp-action="Edit" asp-route-id="@e.Id">Edit</a>
+                                        @* Delete is a POST form. onsubmit runs a little JavaScript first:
+                                           confirm() shows an OK/Cancel box, and "return false" (Cancel)
+                                           stops the form from being sent. *@
+                                        <form method="post" asp-action="Delete" asp-route-id="@e.Id"
+                                              onsubmit="return confirm('Delete this entry? This cannot be undone.');">
+                                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    }
+</div>

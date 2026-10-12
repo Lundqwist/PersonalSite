@@ -1,0 +1,78 @@
+@*
+    Views/Shared/PostDetails.cshtml — one story, project or portfolio item.
+    Shared by the three controllers in Controllers/PostCategoryController.cs.
+*@
+@using System.Globalization
+@using PersonalSite.Services
+@model Post
+@* The Markdown converter, provided by dependency injection *@
+@inject MarkdownRenderer Markdown
+@{
+    // Shared by Stories, Projects and Portfolio
+    var category = Model.Category;
+    var isPortfolio = category == PostCategory.Portfolio;
+    var backText = category switch
+    {
+        PostCategory.Story => Lang.T("Alla berättelser", "All stories"),
+        PostCategory.Project => Lang.T("Alla projekt", "All projects"),
+        _ => Lang.T("Hela portfolion", "Whole portfolio"),
+    };
+    ViewData["Title"] = Model.Title;
+}
+
+<article class="post-article">
+    <div class="post-article-top">
+        @* asp-action="Index" without a controller = this controller's list page *@
+        <a class="post-back" asp-action="Index">← @backText</a>
+    </div>
+
+    <header>
+        <div class="post-card-meta">
+            <time datetime="@Model.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                @Model.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
+            </time>
+            <partial name="_LangTag" model="Model" />
+        </div>
+        <h1 lang="@Model.Language">@Model.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Summary))
+        {
+            <p class="post-lead" lang="@Model.Language">@Model.Summary</p>
+        }
+        @* Portfolio items get a prominent "Visit site" button near the top.
+           target="_blank" opens a new tab; rel="noopener noreferrer" stops the
+           other site from controlling this tab (a security precaution). *@
+        @if (isPortfolio && !string.IsNullOrWhiteSpace(Model.Url))
+        {
+            <p class="post-visit">
+                <a class="btn btn-primary" href="@Model.Url" target="_blank" rel="noopener noreferrer">
+                    @Lang.T("Besök webbplatsen", "Visit site") ↗
+                </a>
+                <span class="post-visit-host">@Model.UrlHost</span>
+            </p>
+        }
+    </header>
+
+    @* The cover image, full size *@
+    @if (Model.CoverImageId.HasValue)
+    {
+        <figure class="post-cover">
+            <img src="/media/@Model.CoverImageId" alt="" decoding="async" />
+        </figure>
+    }
+
+    @* The text: Markdown converted to safe HTML (see Services/MarkdownRenderer.cs) *@
+    @if (!string.IsNullOrWhiteSpace(Model.Body))
+    {
+        <div class="post-body prose" lang="@Model.Language">@Markdown.Render(Model.Body)</div>
+    }
+
+    @* The link again at the bottom *@
+    @if (!string.IsNullOrWhiteSpace(Model.Url))
+    {
+        <p class="post-link">
+            <a href="@Model.Url" target="_blank" rel="noopener noreferrer">
+                @(isPortfolio ? Lang.T("Besök webbplatsen", "Visit site") : Lang.T("Öppna länk", "Open link")) ↗
+            </a>
+        </p>
+    }
+</article>
