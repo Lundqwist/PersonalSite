@@ -63,6 +63,8 @@
                     <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-admin @(ViewContext.RouteData.Values["area"]?.ToString() == "Admin" ? "active" : "")">Admin</a></li>
                 }
             </ul>
+            @* The SV | EN switch, on every page (Views/Shared/_LangSwitch.cshtml) *@
+            <partial name="_LangSwitch" view-data='new ViewDataDictionary(ViewData) { ["Compact"] = true }' />
         </nav>
     </header>
 

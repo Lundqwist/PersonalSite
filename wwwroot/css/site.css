@@ -670,6 +670,15 @@ ul { list-style: none; }
     outline-offset: 2px;
 }
 
+/* The small SV | EN switch in the menu bar */
+.lang-switch--nav { flex-shrink: 0; }
+.lang-switch--nav a {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 0.3rem 0.65rem;
+}
+
 /* ── Empty pages ─────────────────────────────────────── */
 .empty-page {
     display: flex;
@@ -790,14 +799,15 @@ ul { list-style: none; }
     color: var(--accent);
 }
 
+/* Same width as the page headers (text + image) on the list pages */
 .post-article {
-    max-width: 720px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 3rem 2rem 5rem;
 }
 
-/* Pages like About: same width as the .page-header above (text + image) */
-.post-article--page { padding-top: 0; max-width: 1100px; }
+/* Pages like About: no extra space above, the .page-header already has it */
+.post-article--page { padding-top: 0; }
 
 /* A text block shown as a card, e.g. the About text (colors/frame: see the card lists) */
 .page-card {
