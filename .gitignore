@@ -23,6 +23,7 @@ Data/*.pdf
 
 # Local settings overrides, if you create any
 appsettings.*.local.json
+.claude/settings.local.json
 
 # OS files
 Thumbs.db
