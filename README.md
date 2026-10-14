@@ -311,8 +311,9 @@ Files on the NAS, in `/volume1/docker/personalsite/` (`\\192.168.50.2\docker\per
 
 ### Updating the site
 1. Run `.\deploy.ps1` in the project folder (publishes and copies to the NAS).
-   It may end with exit code 1–3: that is robocopy's "files copied" code, not an
-   error. Only 8 or higher means the copy failed (the script then stops).
+   It deletes each file before copying its new version, so the running site
+   keeps working on its old copy until the restart. (Overwriting the files in
+   place while the site runs makes it crash with empty "500" errors.)
 2. DSM → Container Manager → Project → *personalsite* → Action → **Restart**.
 3. Reload the page with **Ctrl+F5** to skip the browser's cache.
 

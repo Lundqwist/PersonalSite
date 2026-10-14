@@ -88,7 +88,10 @@
    and border, which makes sizes much easier to reason about.
    "*" = every element; ::before/::after = generated content (see .hn-card). */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; scroll-behavior: smooth; }
+/* scrollbar-gutter: always reserve room for the scrollbar. Otherwise long pages
+   (with a scrollbar) are ~15px narrower than short ones, and the centered
+   layout hops sideways when you switch pages. */
+html { font-size: 16px; scroll-behavior: smooth; scrollbar-gutter: stable; }
 body {
     font-family: 'Inter', sans-serif;
     background: var(--bg);
@@ -290,15 +293,15 @@ ul { list-style: none; }
 .framed-image--wide { aspect-ratio: 3 / 2; }
 .framed-image--landscape { aspect-ratio: 6 / 5; }
 
-/* Language switch placed under a headline (About page) */
 
+/* Every header image has the SAME height (--header-img-h, set on .page-header);
+   its width follows from its shape (square, wide or landscape). Together with
+   the text block's min-height below, the headline starts on the same spot on
+   Stories, Projects, Portfolio, About and CV (which has no image). */
 .page-header-image {
-    width: clamp(160px, 22vw, 260px);
+    height: var(--header-img-h);
+    width: auto;
     flex-shrink: 0;
-}
-
-.page-header-image--wide {
-    width: clamp(220px, 32vw, 380px);
 }
 
 /* Site address on portfolio cards */
@@ -322,9 +325,6 @@ ul { list-style: none; }
     color: var(--text-muted);
 }
 
-.page-header--with-actions:has(.page-header-image) {
-    align-items: center;
-}
 
 .hero-eyebrow {
     font-size: 0.8rem;
@@ -434,6 +434,8 @@ ul { list-style: none; }
 
 /* ── Page header ─────────────────────────────────────── */
 .page-header {
+    /* The one height for all header images (see .page-header-image) */
+    --header-img-h: clamp(150px, 20vw, 260px);
     max-width: 1100px;
     margin: 0 auto;
     padding: 4rem 2rem 2rem;
@@ -654,9 +656,18 @@ ul { list-style: none; }
 .page-header--with-actions {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     flex-wrap: wrap;
     gap: 1.5rem;
+}
+
+/* The eyebrow + headline block is as tall as the header images and centers its
+   text, so pages with and without an image put the headline in the same place */
+.page-header--with-actions > div:first-child {
+    min-height: var(--header-img-h);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .lang-switch {
@@ -840,8 +851,9 @@ ul { list-style: none; }
     padding: 3rem 2rem 5rem;
 }
 
-/* Pages like About: no extra space above, the .page-header already has it */
-.post-article--page { padding-top: 0; }
+/* Pages like About: the same small gap under the .page-header as the card
+   lists (.post-list) and the CV sections, so the content starts on the same spot */
+.post-article--page { padding-top: 1rem; }
 
 /* A text block shown as a card, e.g. the About text (colors/frame: see the card lists) */
 .page-card {
@@ -1754,6 +1766,11 @@ a.footer-item:focus-visible,
 }
 
 @media (max-width: 600px) {
+    /* Phones: no header image next to the headline (tablets and desktops keep it),
+       and no reserved image height above the headline */
+    .page-header-image { display: none; }
+    .page-header--with-actions > div:first-child { min-height: 0; }
+
     /* Phones: cookie notice text above a full-width OK button */
     .cookie-notice { flex-direction: column; align-items: stretch; bottom: 0.5rem; }
 

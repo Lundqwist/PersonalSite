@@ -36,10 +36,24 @@ Remove-Item (Join-Path $publish 'appsettings.Development.json'), (Join-Path $pub
 
 Write-Host "2/3  Copying to $Target\app ..."
 New-Item -ItemType Directory -Force (Join-Path $Target 'app'), (Join-Path $Target 'keys'), (Join-Path $Target 'showcase') | Out-Null
+
+# The site is usually still running while we copy. Overwriting a file in place
+# changes it under the running program, which then crashes on anything it hadn't
+# loaded yet (pages and images start failing with an empty "500" error).
+# So first DELETE every file that is about to be replaced: the running site
+# keeps its already-open copy of the old file (Linux allows that) until the
+# restart, and robocopy then writes the new file as a fresh copy.
+$app = Join-Path $Target 'app'
+Get-ChildItem $publish -Recurse -File | ForEach-Object {
+    $old = Join-Path $app $_.FullName.Substring($publish.Length).TrimStart('\')
+    if (Test-Path -LiteralPath $old) { Remove-Item -LiteralPath $old -Force }
+}
 # robocopy /MIR = make the target an exact mirror of the source.
 # /NFL /NDL /NJH /NP = less output. Exit codes below 8 mean success.
-robocopy $publish (Join-Path $Target 'app') /MIR /NFL /NDL /NJH /NP /R:2 /W:2 | Out-Null
+robocopy $publish $app /MIR /NFL /NDL /NJH /NP /R:2 /W:2 | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "robocopy failed with exit code $LASTEXITCODE." }
+# robocopy's codes 1-7 mean success; reset so the script itself ends with 0
+$global:LASTEXITCODE = 0
 
 Write-Host '3/3  Copying docker-compose.yml ...'
 Copy-Item (Join-Path $PSScriptRoot 'deploy\docker-compose.yml') (Join-Path $Target 'docker-compose.yml') -Force
@@ -50,3 +64,4 @@ if (-not (Test-Path (Join-Path $Target '.env'))) {
 
 Write-Host ''
 Write-Host 'Done. Now restart the container in DSM: Container Manager -> Project -> personalsite -> Action -> Restart.'
+Write-Host 'Until you restart, the site keeps running the previous version (CSS/JS/image changes show right away).'
