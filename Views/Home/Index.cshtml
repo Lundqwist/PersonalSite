@@ -1,7 +1,7 @@
 @*
     Views/Home/Index.cshtml — the front page (shown by HomeController.Index).
     Two parts: the "hero" (welcome text + portrait) and the grid of five boxes
-    linking to the other pages. All styling is in wwwroot/css/site.css.
+    linking to the other pages, in the same order as the menu bar. All styling is in wwwroot/css/site.css.
 *@
 @{
     // Text for the browser tab, used by _Layout.cshtml
@@ -27,12 +27,6 @@
 
 @* ── Five boxes linking to the sections. The whole box is a link (<a>). ── *@
 <section class="home-nav-grid">
-    <a class="hn-card" asp-controller="CV" asp-action="Index">
-        <span class="hn-icon">◈</span>
-        <h2>CV</h2>
-        <p>Professional background, education, and board roles</p>
-        <span class="hn-arrow">→</span>
-    </a>
     <a class="hn-card" asp-controller="Stories" asp-action="Index">
         <span class="hn-icon">◇</span>
         <h2>Stories</h2>
@@ -55,6 +49,12 @@
         <span class="hn-icon">◉</span>
         <h2>About</h2>
         <p>Who I am and what drives me</p>
+        <span class="hn-arrow">→</span>
+    </a>
+    <a class="hn-card" asp-controller="CV" asp-action="Index">
+        <span class="hn-icon">◈</span>
+        <h2>CV</h2>
+        <p>Professional background, education, and board roles</p>
         <span class="hn-arrow">→</span>
     </a>
 </section>

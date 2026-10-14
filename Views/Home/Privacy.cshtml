@@ -1,12 +1,76 @@
 @*
-    Views/Home/Privacy.cshtml — left over from the ASP.NET Core project
-    template. It is NOT used: HomeController has no Privacy action and no
-    link points here. You can delete this file, or write a privacy page here
-    and add  public IActionResult Privacy() => View();  to HomeController.
+    Views/Home/Privacy.cshtml — the privacy & cookies page (/Privacy).
+    Linked from the cookie notice (Views/Shared/_CookieNotice.cshtml) and the footer.
+    Keep the cookie table in step with the code if cookies are added or removed:
+    LanguageController (language), Program.cs (admin login), the admin forms
+    (antiforgery) and AdminControllerBase.SetMessage (TempData).
 *@
 @{
-    ViewData["Title"] = "Privacy Policy";
+    string T(string sv, string en) => Lang.T(sv, en);
+    ViewData["Title"] = T("Integritet & cookies", "Privacy & cookies");
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="page-header">
+    <p class="page-eyebrow">@T("Integritet", "Privacy")</p>
+    <h1>@T("Integritet & cookies", "Privacy & cookies")</h1>
+</div>
+
+<article class="post-article post-article--page">
+    <div class="post-body prose page-card">
+        <p><strong>@T("Kort sagt: den här webbplatsen spårar dig inte.",
+                      "In short: this site does not track you.")</strong>
+            @T("Det finns ingen statistik, inga annonser och inga cookies från andra företag.",
+               "There are no analytics, no ads and no cookies from other companies.")</p>
+
+        <h2>@T("Cookies", "Cookies")</h2>
+        <p>@T("En cookie är en liten textfil som webbplatsen sparar i din webbläsare. Här används bara cookies som behövs för att sidan ska fungera som du har bett om:",
+              "A cookie is a small text file the site stores in your browser. Only cookies needed for the site to work as you asked are used:")</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">@T("Cookie", "Cookie")</th>
+                    <th scope="col">@T("Syfte", "Purpose")</th>
+                    <th scope="col">@T("Sparas", "Kept for")</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.AspNetCore.Culture</code></td>
+                    <td>@T("Kommer ihåg om du valt svenska eller engelska. Sätts bara när du klickar på SV eller EN.",
+                           "Remembers whether you chose Swedish or English. Only set when you click SV or EN.")</td>
+                    <td>@T("1 år", "1 year")</td>
+                </tr>
+                <tr>
+                    <td><code>PersonalSite.Admin</code></td>
+                    <td>@T("Håller webbplatsens ägare inloggad i administrationen. Påverkar inte besökare.",
+                           "Keeps the site owner logged in to the admin area. Does not affect visitors.")</td>
+                    <td>@T("8 timmar utan aktivitet", "8 hours of inactivity")</td>
+                </tr>
+                <tr>
+                    <td><code>.AspNetCore.Antiforgery.*</code></td>
+                    <td>@T("Skyddar inloggnings- och adminformulären mot attacker från andra webbplatser.",
+                           "Protects the login and admin forms against attacks from other websites.")</td>
+                    <td>@T("Tills webbläsaren stängs", "Until the browser closes")</td>
+                </tr>
+                <tr>
+                    <td><code>.AspNetCore.Mvc.CookieTempData</code></td>
+                    <td>@T("Visar ett bekräftelsemeddelande i administrationen efter att något sparats.",
+                           "Shows a confirmation message in the admin area after something is saved.")</td>
+                    <td>@T("Raderas när meddelandet visats", "Deleted once the message is shown")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>@T("Eftersom de här cookies är nödvändiga för funktioner du själv använder behövs inget samtycke. När du klickar OK på cookie-rutan sparas det i webbläsarens lokala lagring (inte som en cookie), så att rutan inte visas igen.",
+              "Because these cookies are needed for features you use yourself, no consent is required. When you click OK on the cookie notice, that is saved in your browser's local storage (not as a cookie), so the notice doesn't show again.")</p>
+
+        <h2>@T("Typsnitt från Google", "Fonts from Google")</h2>
+        <p>@T("Webbplatsens typsnitt (Playfair Display och Inter) hämtas från Google Fonts. Det sätter inga cookies, men din webbläsare kontaktar då Googles servrar, som därmed ser din IP-adress.",
+              "The site's fonts (Playfair Display and Inter) are loaded from Google Fonts. That sets no cookies, but your browser contacts Google's servers, which therefore see your IP address.")</p>
+
+        <h2>@T("Kontakt", "Contact")</h2>
+        <p>@T("Frågor om din integritet? Skriv till", "Questions about your privacy? Write to")
+            <a href="mailto:bjarne@lundqwist.se">bjarne@lundqwist.se</a>.</p>
+    </div>
+</article>

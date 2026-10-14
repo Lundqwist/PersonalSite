@@ -6,6 +6,7 @@
 //   • Each public method is an "action" that handles one kind of request.
 //   • The URL decides which one runs (see the routes in Program.cs):
 //       /            -> HomeController.Index()
+//       /Privacy     -> HomeController.Privacy()
 //       /Home/Error  -> HomeController.Error()
 //   • The action returns a result, usually View(): "render the matching
 //     .cshtml file", here Views/Home/Index.cshtml.
@@ -23,6 +24,11 @@ public class HomeController : Controller
     // The front page has no data from the database; it just shows the view.
     // IActionResult = "some kind of response" (a page, a redirect, an error...).
     public IActionResult Index() => View();
+
+    // The privacy & cookies page, linked from the cookie notice and the footer.
+    // [HttpGet("/Privacy")] gives it the short address /Privacy instead of /Home/Privacy.
+    [HttpGet("/Privacy")]
+    public IActionResult Privacy() => View();
 
     // The friendly error page used on the live site (UseExceptionHandler in
     // Program.cs). [ResponseCache] makes sure browsers never cache an error.

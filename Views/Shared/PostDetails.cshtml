@@ -26,7 +26,9 @@
         <a class="post-back" asp-action="Index">← @backText</a>
     </div>
 
-    <header>
+    @* Title card: date, SE/EN tag, title, summary (and "Visit site" for portfolio
+       items), in the same card style as the text below (.page-card in site.css) *@
+    <header class="page-card post-header-card">
         <div class="post-card-meta">
             <time datetime="@Model.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
                 @Model.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
@@ -60,10 +62,11 @@
         </figure>
     }
 
-    @* The text: Markdown converted to safe HTML (see Services/MarkdownRenderer.cs) *@
+    @* The text: Markdown converted to safe HTML (see Services/MarkdownRenderer.cs),
+       shown in a card like the About page (.page-card in site.css) *@
     @if (!string.IsNullOrWhiteSpace(Model.Body))
     {
-        <div class="post-body prose" lang="@Model.Language">@Markdown.Render(Model.Body)</div>
+        <div class="post-body prose page-card" lang="@Model.Language">@Markdown.Render(Model.Body)</div>
     }
 
     @* The link again at the bottom *@

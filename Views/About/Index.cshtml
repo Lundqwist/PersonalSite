@@ -23,10 +23,7 @@
         <p class="page-eyebrow">@Lang.T("Om mig", "About")</p>
         @* Use the saved heading, or a default when none is written *@
         <h1>@(string.IsNullOrWhiteSpace(title) ? Lang.T("Om mig", "About me") : title)</h1>
-        @* The About text exists in both languages, so it keeps its switch *@
-        <div class="page-header-switch">
-            <partial name="_LangSwitch" />
-        </div>
+        @* The language is chosen with the SV | EN switch in the menu bar *@
     </div>
     @* Framed image to the right of the headline (styles: .framed-image in site.css) *@
     <figure class="framed-image framed-image--landscape page-header-image page-header-image--wide">

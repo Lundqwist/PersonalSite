@@ -49,13 +49,18 @@
     <header class="site-header">
         <nav class="nav-container">
             @* asp-area="" keeps these links on the public site, also from admin pages *@
-            <a class="nav-brand" asp-area="" asp-controller="Home" asp-action="Index" aria-label="Home">⬡</a>
+            @* The Lundqwist logo. It is taller than the menu bar on purpose: the
+               letters sit on the bar's bottom line and the q's tail hangs below it.
+               alt="" because the link's aria-label already says "Home". *@
+            <a class="nav-brand" asp-area="" asp-controller="Home" asp-action="Index" aria-label="Home">
+                <img src="~/images/logo.png" asp-append-version="true" alt="" width="183" height="88" />
+            </a>
             <ul class="nav-links">
-                <li><a asp-area="" asp-controller="CV" asp-action="Index" class="@ActiveIf("CV")">CV</a></li>
                 <li><a asp-area="" asp-controller="Stories" asp-action="Index" class="@ActiveIf("Stories")">Stories</a></li>
                 <li><a asp-area="" asp-controller="Projects" asp-action="Index" class="@ActiveIf("Projects")">Projects</a></li>
                 <li><a asp-area="" asp-controller="Portfolio" asp-action="Index" class="@ActiveIf("Portfolio")">Portfolio</a></li>
                 <li><a asp-area="" asp-controller="About" asp-action="Index" class="@ActiveIf("About")">About</a></li>
+                <li><a asp-area="" asp-controller="CV" asp-action="Index" class="@ActiveIf("CV")">CV</a></li>
                 @* The Admin link is only shown when you are logged in.
                    "User" is the current visitor, read from the login cookie. *@
                 @if (User.Identity?.IsAuthenticated == true)
@@ -75,6 +80,9 @@
 
     @* <partial> inserts another view: Views/Shared/_Footer.cshtml *@
     <partial name="_Footer" />
+
+    @* The cookie notice (Views/Shared/_CookieNotice.cshtml), shown until OK is clicked *@
+    <partial name="_CookieNotice" />
 
     @* Scripts at the end of <body> so the page content shows first *@
     <script src="~/js/site.js" asp-append-version="true"></script>

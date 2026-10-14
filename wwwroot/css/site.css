@@ -125,6 +125,7 @@ ul { list-style: none; }
 .cv-card,
 .post-card,
 .page-card,
+.cookie-notice,
 .admin-card,
 .admin-table-wrap {
     --text: var(--card-text);
@@ -164,11 +165,30 @@ ul { list-style: none; }
     gap: 2.5rem;
 }
 
+/* The logo: the link is as tall as the bar (60px); the image inside is 88px
+   tall and hangs out below it. At that size the letters' bottom (row 278 of
+   the 402px original) lands on the bar's bottom line, so only the roots and
+   the tail of the q cross the line. */
 .nav-brand {
-    font-size: 1.6rem;
-    color: var(--accent);
-    line-height: 1;
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+    width: 183px;
+    height: 60px;
+    border-radius: 8px;
 }
+
+.nav-brand img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 183px;
+    height: auto;
+    z-index: 1;
+    transition: transform 0.25s ease;
+}
+
+.nav-brand:hover img { transform: scale(1.03); }
 
 .nav-links {
     display: flex;
@@ -271,7 +291,6 @@ ul { list-style: none; }
 .framed-image--landscape { aspect-ratio: 6 / 5; }
 
 /* Language switch placed under a headline (About page) */
-.page-header-switch { margin-top: 1.25rem; }
 
 .page-header-image {
     width: clamp(160px, 22vw, 260px);
@@ -670,14 +689,29 @@ ul { list-style: none; }
     outline-offset: 2px;
 }
 
-/* The small SV | EN switch in the menu bar */
-.lang-switch--nav { flex-shrink: 0; }
+/* The small SV | EN switch in the menu bar: inverted against the light bar,
+   a navy pill with light text; the chosen language is light orange with dark
+   text (contrast 12:1 and 9:1). Fixed colors, because the menu bar re-points
+   the shared tokens to its own light palette. */
+.lang-switch--nav {
+    flex-shrink: 0;
+    background: #0E2D57;
+    border-color: #0E2D57;
+}
 .lang-switch--nav a {
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     padding: 0.3rem 0.65rem;
+    color: #EAF1FA;
 }
+.lang-switch--nav a:hover { color: #FFFFFF; background: #1A3A63; }
+.lang-switch--nav a.active,
+.lang-switch--nav a.active:hover {
+    background: var(--card-bg);
+    color: var(--card-text);
+}
+.lang-switch--nav a:focus-visible { outline-color: #0E2D57; }
 
 /* ── Empty pages ─────────────────────────────────────── */
 .empty-page {
@@ -814,6 +848,10 @@ ul { list-style: none; }
     border-radius: var(--radius);
     padding: 2.5rem;
 }
+
+/* The title card at the top of a story, project or portfolio item */
+.post-header-card { margin-bottom: 2rem; }
+.post-header-card > :last-child { margin-bottom: 0; }
 
 /* Section headings inside a card get a thin divider above them */
 .page-card.prose h2 {
@@ -1658,7 +1696,49 @@ a.footer-item:focus-visible,
     border-top: 1px solid var(--card-divider);
     font-size: 0.8rem;
     color: var(--text-muted);
+    /* Copyright on the left, "Privacy & cookies" on the right */
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
 }
+
+.footer-privacy {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ── Cookie notice ───────────────────────────────────── */
+/* A small card fixed to the bottom of the window (colors/frame: the card lists) */
+.cookie-notice {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    z-index: 200;
+    width: min(720px, calc(100% - 2rem));
+    display: flex;
+    align-items: center;
+    gap: 1rem 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.cookie-notice[hidden] { display: none; }
+
+.cookie-notice p { flex: 1; }
+
+.cookie-notice a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.cookie-notice .btn { flex-shrink: 0; min-width: 4.5rem; }
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 900px) {
@@ -1674,6 +1754,9 @@ a.footer-item:focus-visible,
 }
 
 @media (max-width: 600px) {
+    /* Phones: cookie notice text above a full-width OK button */
+    .cookie-notice { flex-direction: column; align-items: stretch; bottom: 0.5rem; }
+
     .home-nav-grid {
         grid-template-columns: 1fr;
     }
@@ -1727,6 +1810,20 @@ a.footer-item:focus-visible,
         row-gap: 0.25rem;
     }
 
+    /* Phones: two rows. Row 1 = a smaller logo + the SV | EN switch,
+       row 2 = the menu links. The row gap leaves room for the q's tail. */
+    .nav-container { flex-wrap: wrap; row-gap: 1.1rem; }
+    .nav-brand,
+    .nav-brand img { width: 130px; }
+    .nav-brand { height: 44px; }
+    .lang-switch--nav { margin-left: auto; }
+    .nav-links {
+        order: 3;
+        width: 100%;
+        margin-left: 0;
+        justify-content: center;
+    }
+
     .nav-links a {
         padding: 0.4rem 0.55rem;
         font-size: 0.8rem;
@@ -1762,6 +1859,7 @@ a.footer-item:focus-visible,
 .cv-card,
 .post-card,
 .page-card,
+.cookie-notice,
 .admin-card,
 .admin-table-wrap {
     background: var(--card-bg);

@@ -1,0 +1,17 @@
+@*
+    Views/Shared/_CookieNotice.cshtml — the small cookie notice at the bottom of
+    every page (included by _Layout.cshtml).
+
+    The site only uses necessary cookies, so this is information, not a consent
+    question: one OK button. It starts "hidden"; wwwroot/js/site.js shows it
+    unless the visitor already clicked OK (remembered in localStorage, not in a
+    cookie). Without JavaScript the notice simply never appears.
+*@
+<aside class="cookie-notice" id="cookie-notice" aria-label="@Lang.T("Om cookies", "About cookies")" hidden>
+    <p>
+        @Lang.T("Den här webbplatsen använder bara nödvändiga cookies, till exempel för att komma ihåg ditt språkval. Ingen spårning, inga annonser.",
+                "This site only uses necessary cookies, for example to remember your language choice. No tracking, no ads.")
+        <a asp-area="" asp-controller="Home" asp-action="Privacy">@Lang.T("Läs mer", "Read more")</a>
+    </p>
+    <button type="button" class="btn btn-primary btn-small" data-cookie-ok>OK</button>
+</aside>
