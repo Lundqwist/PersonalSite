@@ -1,0 +1,228 @@
+SHOW & TELL — How the CV gets from the database to the website
+================================================================
+
+The journey of one CV entry, step by step, in the order the data travels:
+
+   MariaDB table "CvEntries"
+        │  (1) connection set up in Program.cs
+        ▼
+   CvEntry model + AppDbContext          (2) the table as C# objects
+        │
+        ▼
+   CvController.Index()                  (3) reads + groups the entries
+        │  View(grouped)
+        ▼
+   Views/CV/Index.cshtml                 (4) turns them into HTML cards
+        │
+        ▼
+   https://lundqwist.se/CV               (5) what the visitor sees
+
+Every step below says FILE:LINE so you can jump straight to it.
+(In VS Code: Ctrl+P, type the file name, then ":" and the line number,
+ e.g.  Controllers/CvController.cs:34 )
+
+
+----------------------------------------------------------------
+STEP 1 — Connecting to the database
+----------------------------------------------------------------
+
+Program.cs:85-87
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+  • Reads the connection string (server, database, user, password) and
+    registers AppDbContext, so any controller can ask for it.
+  • Where the connection string comes from:
+      - on the NAS:   deploy/docker-compose.yml:33
+                          - ConnectionStrings__DefaultConnection=${DB_CONNECTION}
+                      (the real value is in the secret .env file on the NAS)
+      - on your PC:   .NET user secrets  (dotnet user-secrets list)
+
+Program.cs:144
+    db.Database.Migrate();
+  • At start-up, creates/updates the tables (incl. CvEntries) if needed.
+
+
+----------------------------------------------------------------
+STEP 2 — The table, described in C#
+----------------------------------------------------------------
+
+Models/CvEntry.cs:20-26   — the four CV sections
+    public enum CvEntryType
+    {
+        Workplace,
+        Course,
+        School,
+        Board
+    }
+
+Models/CvEntry.cs:31-90   — one CV entry = one row in the table
+    Each property is a column:
+
+      Line  Property          What it holds
+      ----  ----------------  -----------------------------------------
+       35   Id                unique number (primary key)
+       38   Type              Workplace / Course / School / Board
+       42   Title             title, Swedish          (48: TitleEn)
+       51   Organization      employer/school, Swedish (54: OrganizationEn)
+       57   Location          place, Swedish           (60: LocationEn)
+       63   StartDate         start date (optional)
+       65   EndDate           end date (optional)
+       70   DisplayDate       free-text date, e.g. "1992 – 1994"
+       73   IsCurrent         true = ongoing ("Current" badge)
+       77   Courses           courses, one per line    (80: CoursesEn)
+       84   Comment           notes for the hover panel (87: CommentEn)
+       90   SortOrder         order within its section (1 = first)
+
+Models/CvEntry.cs:96-112  — helpers that pick Swedish or English
+    public string GetTitle(bool en) => en && !string.IsNullOrWhiteSpace(TitleEn) ? TitleEn : Title;
+    ...
+  • English is used when the visitor chose EN AND an English text exists;
+    otherwise the Swedish text is shown.
+  • GetCourses (104-112) splits the course text into lines for a bullet list.
+
+Data/AppDbContext.cs:27
+    public DbSet<CvEntry> CvEntries => Set<CvEntry>();
+  • "CvEntries" is the table you query from C#.
+
+Data/AppDbContext.cs:43-50
+    modelBuilder.Entity<CvEntry>(e =>
+    {
+        e.HasKey(x => x.Id);
+        e.Property(x => x.Type).HasConversion<string>().HasMaxLength(50);
+        e.HasIndex(x => new { x.Type, x.SortOrder });
+    });
+  • Type is stored as readable text ("Course"), not a number.
+  • The index makes sorting by Type + SortOrder fast.
+
+
+----------------------------------------------------------------
+STEP 3 — Reading the data  (THE code that collects the CV)
+----------------------------------------------------------------
+
+Controllers/CvController.cs:21-24   — gets the database handed in
+    public CvController(AppDbContext db)
+    {
+        _db = db;
+    }
+
+Controllers/CvController.cs:29-48   — runs when someone opens /CV
+    public async Task<IActionResult> Index()
+    {
+        var entries = await _db.CvEntries        // line 34
+            .OrderBy(e => e.Type)                // line 35
+            .ThenBy(e => e.SortOrder)            // line 36
+            .ToListAsync();                      // line 37  <- the database is asked HERE
+
+        var grouped = entries                    // line 42
+            .GroupBy(e => e.Type)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        return View(grouped);                    // line 47  <- hands the data to the view
+    }
+
+  • Lines 34-37: EF Core turns this into SQL, roughly
+        SELECT * FROM CvEntries ORDER BY Type, SortOrder
+  • Lines 42-44: groups the rows into a dictionary:
+        { Workplace: [...], Course: [...], School: [...], Board: [...] }
+  • Line 47: View(grouped) sends that dictionary to Views/CV/Index.cshtml,
+    where it is called "Model".
+
+
+----------------------------------------------------------------
+STEP 4 — Showing the data  (the HTML template)
+----------------------------------------------------------------
+
+Views/CV/Index.cshtml:13
+    @model Dictionary<CvEntryType, List<CvEntry>>
+  • Declares what the controller sends: "Model" is the grouped dictionary.
+
+Views/CV/Index.cshtml:16
+    var en = Lang.IsEnglish;
+  • true when the visitor chose EN in the menu bar.
+
+Views/CV/Index.cshtml:25-39   — date formatting
+  • FormatDate:      "aug. 2022" (SV) or "Aug 2022" (EN)
+  • FormatDateRange: "Aug 2022 – Jun 2024", or DisplayDate if set,
+                     or "... – Present" for ongoing entries
+
+Views/CV/Index.cshtml:43-49   — section order and headings on the page
+    (CvEntryType.Workplace, T("Arbetsplatser", "Workplaces"),            "◈"),
+    (CvEntryType.Course,    T("Kurser", "Courses"),                      "◇"),
+    (CvEntryType.School,    T("Utbildningar", "Education"),              "◆"),
+    (CvEntryType.Board,     T("Styrelser & kommittéer", "Boards & Committees"), "◉"),
+  • Change the order of these lines to change the order on the page.
+
+Views/CV/Index.cshtml:52-58   — page heading ("Curriculum Vitae")
+
+Views/CV/Index.cshtml:62-66   — loop over the sections
+    @foreach (var (type, label, icon) in sections)
+    {
+        if (!Model.ContainsKey(type)) continue;   // skip empty sections
+        var entries = Model[type];                // line 66: this section's entries
+  • Line 66 is where the database data is taken out of "Model".
+
+Views/CV/Index.cshtml:68-73   — section header: icon, heading, count
+    <span class="cv-count">@entries.Count</span>      (line 72)
+
+Views/CV/Index.cshtml:76-145  — one card per entry
+     76   @foreach (var entry in entries)
+     79-82  pick Swedish/English: organization, location, courses, comment
+     85   <div class="cv-card ...">        "cv-card--current" if ongoing
+     89   @entry.GetTitle(en)              the title
+     92   @organization                    the organization
+     95-98  the "Current" badge (IsCurrent)
+    101-108 the location, with a map-pin icon
+    109-113 the dates, with a calendar icon  (@FormatDateRange(entry))
+    118-143 the hover panel: courses (122-134) and notes (135-140)
+
+
+----------------------------------------------------------------
+STEP 5 — Where it appears on the website
+----------------------------------------------------------------
+
+  The page:  https://lundqwist.se/CV
+
+  How a visitor gets there:
+    • Menu bar, on every page:   Views/Shared/_Layout.cshtml:63
+          <li><a asp-area="" asp-controller="CV" asp-action="Index" ...>CV</a></li>
+    • CV box on the front page:  Views/Home/Index.cshtml:54
+          <a class="hn-card" asp-controller="CV" asp-action="Index">
+
+  Why /CV runs CvController.Index():  Program.cs:232-234
+          app.MapControllerRoute(
+              name: "default",
+              pattern: "{controller=Home}/{action=Index}/{id?}");
+    /CV  ->  controller = "Cv" (CvController), action = Index (default)
+
+  The look of the cards (wwwroot/css/site.css):
+    461   .cv-section         one section block
+    499   .cv-grid            the grid of cards
+    508   .cv-card            one card
+    597   .cv-card-comment    the hover panel (slides up on hover, line 607)
+
+
+----------------------------------------------------------------
+BONUS — Where the CV data is WRITTEN (the admin side)
+----------------------------------------------------------------
+
+  You edit the CV at https://lundqwist.se/Admin/Cv (login required).
+
+  Areas/Admin/Controllers/CvController.cs
+      45   Index()       list of all entries, one table per section
+      58   Create()      empty form for a new entry
+      71   Create()      saves a new entry      (POST)
+      92   Edit(id)      form for an existing entry
+     102   EditPost(id)  saves the changes      (POST)
+     121   Delete(id)    deletes an entry       (POST)
+
+  Areas/Admin/Views/Cv/Index.cshtml   the admin list
+  Areas/Admin/Views/Cv/Edit.cshtml    the add/edit form
+
+  Data/CvSeedData.cs only held the ORIGINAL CV content (inserted once by a
+  migration). Changing it does NOT change the live CV — use the admin page.
+
+
+Line numbers are correct as of 2026-10-14. If you edit a file, its line numbers
+below the change shift; search for the code text instead.
