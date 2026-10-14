@@ -124,6 +124,7 @@ ul { list-style: none; }
 .hn-card,
 .cv-card,
 .post-card,
+.page-card,
 .admin-card,
 .admin-table-wrap {
     --text: var(--card-text);
@@ -795,7 +796,21 @@ ul { list-style: none; }
     padding: 3rem 2rem 5rem;
 }
 
-.post-article--page { padding-top: 0; }
+/* Pages like About: same width as the .page-header above (text + image) */
+.post-article--page { padding-top: 0; max-width: 1100px; }
+
+/* A text block shown as a card, e.g. the About text (colors/frame: see the card lists) */
+.page-card {
+    border-radius: var(--radius);
+    padding: 2.5rem;
+}
+
+/* Section headings inside a card get a thin divider above them */
+.page-card.prose h2 {
+    padding-top: 1.2em;
+    border-top: 1px solid var(--border);
+}
+.page-card.prose > h2:first-child { padding-top: 0; border-top: none; }
 
 .post-article-top {
     display: flex;
@@ -1673,7 +1688,8 @@ a.footer-item:focus-visible,
         padding-right: 1rem;
     }
 
-    .admin-form { padding: 1.25rem; }
+    .admin-form,
+    .page-card { padding: 1.25rem; }
 
     .hero-title {
         font-size: 2.5rem;
@@ -1735,6 +1751,7 @@ a.footer-item:focus-visible,
 .hn-card,
 .cv-card,
 .post-card,
+.page-card,
 .admin-card,
 .admin-table-wrap {
     background: var(--card-bg);

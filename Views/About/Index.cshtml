@@ -48,6 +48,6 @@ else
 {
     <article class="post-article post-article--page">
         @* Markdown.Render returns safe, already-cleaned HTML (see MarkdownRenderer.cs) *@
-        <div class="post-body prose" lang="@contentLang">@Markdown.Render(body)</div>
+        <div class="post-body prose page-card" lang="@contentLang">@Markdown.Render(body)</div>
     </article>
 }
