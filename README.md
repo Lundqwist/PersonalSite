@@ -45,7 +45,7 @@ Their copyright remains with their respective authors.
 | HtmlSanitizer (with AngleSharp) | Cleaning HTML for safety | MIT |
 | Bootstrap Icons 1.11.3 | Footer icons (email, LinkedIn, Discord, location) | MIT |
 | Bootstrap, jQuery, jQuery Validation (`wwwroot/lib/`) | Included by the project template | MIT |
-| Playfair Display, Inter (Google Fonts) | Typefaces | SIL Open Font License 1.1 |
+| Playfair Display, Inter (Google Fonts) | Typefaces, loaded from Google's servers (see `/Privacy`) | SIL Open Font License 1.1 |
 
 The full license texts are in each package and in `wwwroot/lib/*/LICENSE*`.
 
@@ -53,19 +53,40 @@ The full license texts are in each package and in `wwwroot/lib/*/LICENSE*`.
 
 ## What the site does
 
+The pages, in menu order:
+
 | Page | Address | Content |
 |---|---|---|
 | Home | `/` | Welcome text, portrait and links to all sections |
-| CV | `/CV` | Jobs, courses, education and board roles; notes and courses taught appear when you hover over a card |
 | Stories | `/Stories` | Texts, each written in Swedish (SE) or English (EN) |
 | Projects | `/Projects` | Side projects, each SE or EN |
 | Portfolio | `/Portfolio` | Websites and work, with a "Visit site" link |
 | About | `/About` | About text in English, with optional Swedish version |
-| Admin | `/Admin` | Log in to add and edit all of the above |
+| CV | `/CV` | Jobs, courses, education and board roles; notes and courses taught appear when you hover over a card |
+| Admin | `/Admin` | Log in to add and edit all of the above (menu link shown only when logged in) |
+| Privacy & cookies | `/Privacy` | Which cookies the site uses, and why (linked from the footer and the cookie notice) |
+| Showcase | `/showcase/…` | Your own files and small static websites, to link to from posts (see *The showcase folder*) |
 
-**Languages.** Swedish is the default. The CV and About pages have a
-*Svenska | English* switch; stories, projects and portfolio items are written in
-one language each and show an **SE** or **EN** tag.
+**Layout.** Every page has the same frame: the menu bar with the Lundqwist logo
+(its letters sit on the bar's bottom line, the q's tail hangs below it) and the
+**SV | EN** switch, and the footer with contact details. On phones the menu
+becomes two rows: logo + language switch, then the links.
+
+A single story, project or portfolio item shows two cards: a title card (date,
+SE/EN tag, title, summary, and "Visit site" for portfolio items) and a text card.
+The About page shows its text in the same kind of card.
+
+**Languages.** Swedish is the default. The **SV | EN** switch in the menu bar
+changes all texts on every page and is remembered in a cookie. Stories, projects
+and portfolio items are written in one language each and show an **SE** or
+**EN** tag.
+
+**Cookies.** Only necessary cookies are used: the language choice, and the
+admin login, form protection and confirmation messages, which only affect the
+logged-in admin. There is no tracking or analytics, so no consent is needed. A
+small notice at the bottom of the page says so and links to `/Privacy`; clicking
+OK hides it for good (remembered in the browser's localStorage, not a cookie).
+If you add a cookie, update the table in `Views/Home/Privacy.cshtml`.
 
 **Admin.** After logging in you can add, edit and delete CV entries, stories,
 projects and portfolio items, and edit the About page. Text is written in
@@ -121,6 +142,9 @@ HTML sent back to the browser, which loads site.css, site.js and images
 | Areas | `Areas/Admin/` |
 | Authentication (cookie login) | `Program.cs`, `Areas/Admin/Controllers/AccountController.cs` |
 | Security: antiforgery, XSS, open redirects | `Program.cs`, `Services/MarkdownRenderer.cs`, `Controllers/LanguageController.cs` |
+| Partial views (reused HTML pieces) | `Views/Shared/_LangSwitch.cshtml`, `_CookieNotice.cshtml`, `_Footer.cshtml` |
+| Serving an extra folder of files | The *showcase* block in `Program.cs` |
+| CSS custom properties ("tokens") | The top of `wwwroot/css/site.css`: cards re-point the shared colors |
 
 ---
 
@@ -139,20 +163,25 @@ PersonalSite/
 │   └── Bjarne_Lundqwist_CV.pdf  The CV document
 ├── Services/
 │   └── MarkdownRenderer.cs      Markdown → safe HTML
-├── Controllers/                 Public pages (Home, CV, Stories/Projects/Portfolio,
-│                                About, Language switch, image serving)
+├── Controllers/                 Public pages (Home + Privacy, CV, Stories/Projects/
+│                                Portfolio, About, Language switch, image serving)
 ├── Views/                       Public HTML templates (Razor .cshtml)
-│   └── Shared/                  Layout, footer, post list/details, partials
+│   └── Shared/                  Layout, footer, post list/details, language switch,
+│                                cookie notice and other partials
 ├── Areas/Admin/                 Admin area (login required)
 │   ├── Controllers/             Account, Dashboard, Cv, Posts, About, Media
 │   ├── Models/                  Form models (login, change password, image list)
 │   └── Views/                   Admin pages and the editor parts
 ├── Migrations/                  Database structure changes, applied at start-up
+├── deploy/
+│   ├── docker-compose.yml       The container definition used on the NAS
+│   └── .env.example             Template for the secret .env file
+├── deploy.ps1                   Publishes the site and copies it to the NAS
 └── wwwroot/                     Files sent to the browser as they are
     ├── css/site.css             All styling
-    ├── js/site.js               Copy button (footer)
+    ├── js/site.js               Copy button (footer) and cookie notice
     ├── js/admin-editor.js       Editor: toolbar, preview, image upload
-    ├── images/                  Portrait and page images
+    ├── images/                  Logo, portrait and page images
     └── lib/                     Third-party libraries from the template
 ```
 
@@ -272,8 +301,9 @@ Files on the NAS, in `/volume1/docker/personalsite/` (`\\192.168.50.2\docker\per
 |---|---|
 | `docker-compose.yml` | Container definition (copy of `deploy/docker-compose.yml`) |
 | `.env` | The database connection string — secret, only on the NAS |
-| `app/` | The published site |
+| `app/` | The published site (replaced on every deploy) |
 | `keys/` | Encryption keys for the login cookie (created automatically) |
+| `showcase/` | Your own files and websites, served at `/showcase/` (never touched by deploys) |
 
 > The site is **not** placed in the `web` share: Web Station publishes that
 > folder as it is, so the site's settings would be downloadable. `web` only
@@ -281,9 +311,47 @@ Files on the NAS, in `/volume1/docker/personalsite/` (`\\192.168.50.2\docker\per
 
 ### Updating the site
 1. Run `.\deploy.ps1` in the project folder (publishes and copies to the NAS).
+   It may end with exit code 1–3: that is robocopy's "files copied" code, not an
+   error. Only 8 or higher means the copy failed (the script then stops).
 2. DSM → Container Manager → Project → *personalsite* → Action → **Restart**.
+3. Reload the page with **Ctrl+F5** to skip the browser's cache.
 
 Database migrations run automatically when the site starts.
+
+- **CSS, JavaScript or image changes only** (`wwwroot/`) usually show without a
+  restart, because those files are read straight from disk.
+- **Changed `docker-compose.yml`** (volumes, environment variables): a Restart
+  is not enough. Stop the project, then **Build** it so the container is
+  recreated with the new settings.
+
+### The showcase folder
+A folder on the NAS for files and small websites that you want to show or link
+to, for example a game you made or a downloadable PDF:
+
+```
+\\192.168.50.2\docker\personalsite\showcase\
+├── README.txt            short how-to
+├── files\                downloads: PDFs, zips, images, builds …
+│     cv.pdf            → https://lundqwist.se/showcase/files/cv.pdf
+└── sites\                static websites, one folder each with an index.html
+      my-game\          → https://lundqwist.se/showcase/sites/my-game/
+```
+
+- New files show up immediately; no deploy or restart needed.
+- Link to them from a post: put the full address in the *Website address* /
+  *Link* field, or in the text: `[Play the game](https://lundqwist.se/showcase/sites/my-game/)`.
+- Use lowercase names without spaces, and relative links inside a site
+  (`css/style.css`, not `/css/style.css`).
+- Only static files work (HTML, CSS, JavaScript, images); no PHP or databases.
+  Everything in the folder is public.
+- **Sandbox.** HTML pages there are served with a `Content-Security-Policy: sandbox`
+  header, so their scripts can never act as the logged-in admin. Side effect:
+  they can't use cookies or localStorage. To allow that for code you fully
+  trust, add `Showcase__Sandbox=false` to the environment in `docker-compose.yml`.
+- How it works: `Program.cs` serves the folder (setting `Showcase:Path`), and
+  `docker-compose.yml` mounts it read-only into the container at `/showcase`.
+  `deploy.ps1` creates the folder if it is missing. When running locally
+  `Showcase:Path` is not set, so `/showcase` doesn't exist there.
 
 ### Passwords
 - Locally, the connection string is stored in .NET **user secrets**
