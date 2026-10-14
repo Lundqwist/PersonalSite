@@ -60,15 +60,14 @@
       <circle cx="40" cy="430" r="1.6" opacity=".6"/>
     </g>
 
-    <circle cx="340" cy="190" r="150" fill="#f6eccb" opacity=".25" filter="url(#glow)"/>
-    <circle cx="340" cy="190" r="130" fill="url(#moon)"/>
-    <g fill="#cbbb88" opacity=".45">
-      <circle cx="300" cy="150" r="22"/>
-      <circle cx="380" cy="120" r="12"/>
-      <circle cx="400" cy="220" r="26"/>
-      <circle cx="320" cy="250" r="14"/>
-      <circle cx="270" cy="200" r="8"/>
+    <mask id="crescent">
+      <circle cx="262" cy="132" r="70" fill="#fff"/>
+      <circle cx="234" cy="114" r="62" fill="#000"/>
+    </mask>
+    <g filter="url(#glow)" opacity=".5">
+      <circle cx="262" cy="132" r="70" fill="#f6eccb" mask="url(#crescent)"/>
     </g>
+    <circle cx="262" cy="132" r="70" fill="url(#moon)" mask="url(#crescent)"/>
 
     <g transform="translate(12 6)" filter="url(#shadow)">
       <use href="#letters" fill="#140a04" stroke="#140a04" stroke-width="16" stroke-linejoin="round"/>
