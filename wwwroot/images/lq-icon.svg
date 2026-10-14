@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Lq</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1430"/>
+      <stop offset="1" stop-color="#1f2a5a"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="0.4" cy="0.38" r="0.65">
+      <stop offset="0" stop-color="#fffbe8"/>
+      <stop offset="0.7" stop-color="#efe4bf"/>
+      <stop offset="1" stop-color="#d8c999"/>
+    </radialGradient>
+    <linearGradient id="woodBase" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d39a5a"/>
+      <stop offset="0.5" stop-color="#a8682f"/>
+      <stop offset="1" stop-color="#c58646"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="wood" x="-15%" y="-15%" width="130%" height="135%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.16" numOctaves="3" seed="11" result="noise"/>
+      <feColorMatrix in="noise" type="matrix"
+        values="0 0 0 0 0.36
+                0 0 0 0 0.19
+                0 0 0 0 0.07
+                1.6 0 0 0 -0.55" result="grain"/>
+      <feComposite in="grain" in2="SourceAlpha" operator="in" result="grainClip"/>
+      <feBlend in="grainClip" in2="SourceGraphic" mode="multiply" result="woodFill"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="bevelBlur"/>
+      <feSpecularLighting in="bevelBlur" surfaceScale="4" specularConstant="0.6" specularExponent="18" lighting-color="#ffe2b8" result="spec">
+        <feDistantLight azimuth="225" elevation="45"/>
+      </feSpecularLighting>
+      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specClip"/>
+      <feComposite in="specClip" in2="woodFill" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="lit"/>
+      <feDropShadow in="lit" dx="0" dy="8" stdDeviation="7" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
+    <clipPath id="tile"><rect width="512" height="512" rx="96"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#tile)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+
+    <g fill="#ffffff">
+      <circle cx="70" cy="80" r="2.2" opacity=".9"/>
+      <circle cx="140" cy="46" r="1.6" opacity=".7"/>
+      <circle cx="210" cy="96" r="1.4" opacity=".6"/>
+      <circle cx="50" cy="210" r="1.8" opacity=".7"/>
+      <circle cx="96" cy="300" r="1.3" opacity=".5"/>
+      <circle cx="470" cy="330" r="1.8" opacity=".7"/>
+      <circle cx="440" cy="460" r="1.4" opacity=".5"/>
+      <circle cx="250" cy="40" r="1.2" opacity=".6"/>
+      <circle cx="40" cy="430" r="1.6" opacity=".6"/>
+    </g>
+
+    <circle cx="340" cy="190" r="150" fill="#f6eccb" opacity=".35" filter="url(#glow)"/>
+    <circle cx="340" cy="190" r="130" fill="url(#moon)"/>
+    <g fill="#cbbb88" opacity=".45">
+      <circle cx="300" cy="150" r="22"/>
+      <circle cx="380" cy="120" r="12"/>
+      <circle cx="400" cy="220" r="26"/>
+      <circle cx="320" cy="250" r="14"/>
+      <circle cx="270" cy="200" r="8"/>
+    </g>
+
+    <g transform="translate(12 6)" filter="url(#wood)" fill="url(#woodBase)">
+      <path d="M94 118 h48 q14 0 14 14 v178 h62 q14 0 14 14 v42 q0 14-14 14 h-124 q-14 0-14-14 v-234 q0-14 14-14 z"/>
+      <path fill-rule="evenodd" d="M322 212 a78 78 0 1 1 0 156 a78 78 0 1 1 0-156 z M322 250 a40 40 0 1 0 0 80 a40 40 0 1 0 0-80 z"/>
+      <path d="M376 212 h28 q14 0 14 14 v206 q0 14-14 14 h-28 q-14 0-14-14 v-206 q0-14 14-14 z"/>
+    </g>
+  </g>
+</svg>
