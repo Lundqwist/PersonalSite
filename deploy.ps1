@@ -35,7 +35,7 @@ if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed.' }
 Remove-Item (Join-Path $publish 'appsettings.Development.json'), (Join-Path $publish 'PersonalSite.exe'), (Join-Path $publish 'web.config') -ErrorAction SilentlyContinue
 
 Write-Host "2/3  Copying to $Target\app ..."
-New-Item -ItemType Directory -Force (Join-Path $Target 'app'), (Join-Path $Target 'keys') | Out-Null
+New-Item -ItemType Directory -Force (Join-Path $Target 'app'), (Join-Path $Target 'keys'), (Join-Path $Target 'showcase') | Out-Null
 # robocopy /MIR = make the target an exact mirror of the source.
 # /NFL /NDL /NJH /NP = less output. Exit codes below 8 mean success.
 robocopy $publish (Join-Path $Target 'app') /MIR /NFL /NDL /NJH /NP /R:2 /W:2 | Out-Null

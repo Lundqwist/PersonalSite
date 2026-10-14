@@ -164,6 +164,44 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();   // redirect http:// to https:// when HTTPS is available
 app.UseStaticFiles();        // serve files from wwwroot (CSS, JavaScript, images) directly
 
+// ── The showcase folder: your own files and small websites at /showcase ──
+// A folder on the NAS (next to app/, so deploys never touch it) where you can
+// drop downloads, PDFs and whole static websites, then link to them from posts:
+//   showcase/files/cv.pdf              -> https://lundqwist.se/showcase/files/cv.pdf
+//   showcase/sites/my-game/index.html  -> https://lundqwist.se/showcase/sites/my-game/
+// "Showcase:Path" is set in docker-compose.yml; when it is empty (e.g. when
+// running locally) this step is skipped.
+var showcasePath = builder.Configuration["Showcase:Path"];
+if (!string.IsNullOrWhiteSpace(showcasePath) && Directory.Exists(showcasePath))
+{
+    var showcaseFiles = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(showcasePath);
+
+    // Folder addresses like /showcase/sites/my-game/ show that folder's index.html
+    app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = showcaseFiles, RequestPath = "/showcase" });
+
+    // Showcase pages run on the same domain as the admin area. "sandbox" makes
+    // the browser treat them as a separate, anonymous site, so their scripts can
+    // never act as the logged-in admin. (Side effect: those pages can't use
+    // cookies or localStorage. Set Showcase__Sandbox=false to allow it, but then
+    // only put sites there whose code you fully trust.)
+    var sandbox = builder.Configuration.GetValue("Showcase:Sandbox", true);
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = showcaseFiles,
+        RequestPath = "/showcase",
+        OnPrepareResponse = ctx =>
+        {
+            ctx.Context.Response.Headers.XContentTypeOptions = "nosniff";
+            var ext = Path.GetExtension(ctx.File.Name).ToLowerInvariant();
+            if (sandbox && ext is ".html" or ".htm")
+            {
+                ctx.Context.Response.Headers.ContentSecurityPolicy =
+                    "sandbox allow-scripts allow-forms allow-popups allow-modals allow-downloads";
+            }
+        },
+    });
+}
+
 // Language: Swedish (sv-SE) is the default. A visitor gets English when they
 // pick it with the language switch (saved in a cookie by LanguageController)
 // or when their browser asks for English. This sets CultureInfo.CurrentCulture,
