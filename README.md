@@ -364,8 +364,7 @@ to, for example a game you made or a downloadable PDF:
   the database over the local network.
 - **Image size limit.** MariaDB's default `max_allowed_packet` is 1 MB, so
   images are kept under 700 KB. Raising it on the NAS allows larger images.
-- The old project in `docker/lundqwist` also uses port 3306 for its own
-  MariaDB container; don't start it while the MariaDB package is running.
+  
 
 ---
 
