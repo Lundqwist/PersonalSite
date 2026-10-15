@@ -5,22 +5,22 @@
 *@
 @{
     // Text for the browser tab, used by _Layout.cshtml
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = Lang.T("Hem", "Home");
 }
 
 @* ── Hero: welcome text on the left, portrait on the right ── *@
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-text">
-            <p class="hero-eyebrow">Welcome</p>
-            <h1 class="hero-title">A place for<br><em>ideas & work</em></h1>
-            <p class="hero-sub">Explore my experience, writing, and projects below.</p>
+            <p class="hero-eyebrow">@Lang.T("Välkommen", "Welcome")</p>
+            <h1 class="hero-title">@Lang.T("En plats för", "A place for")<br><em>@Lang.T("idéer & arbete", "ideas & work")</em></h1>
+            <p class="hero-sub">@Lang.T("Utforska min erfarenhet, mina texter och projekt nedan.", "Explore my experience, writing, and projects below.")</p>
         </div>
         @* alt = description for screen readers. width/height let the browser
            reserve space before the image loads (no jumping layout).
            fetchpriority="high" loads it early since it's at the top. *@
         <figure class="hero-portrait">
-            <img src="~/images/portrait.jpg" asp-append-version="true" alt="Portrait of Bjarne Lundqwist" width="720" height="960" fetchpriority="high" />
+            <img src="~/images/portrait.jpg" asp-append-version="true" alt="@Lang.T("Porträtt av Bjarne Lundqwist", "Portrait of Bjarne Lundqwist")" width="720" height="960" fetchpriority="high" />
         </figure>
     </div>
 </section>
@@ -29,32 +29,32 @@
 <section class="home-nav-grid">
     <a class="hn-card" asp-controller="Stories" asp-action="Index">
         <span class="hn-icon">◇</span>
-        <h2>Stories</h2>
-        <p>Thoughts, essays, and things worth sharing</p>
+        <h2>@Lang.T("Berättelser", "Stories")</h2>
+        <p>@Lang.T("Tankar, essäer och sådant som är värt att dela", "Thoughts, essays, and things worth sharing")</p>
         <span class="hn-arrow">→</span>
     </a>
     <a class="hn-card" asp-controller="Projects" asp-action="Index">
         <span class="hn-icon">◆</span>
-        <h2>Projects</h2>
-        <p>Side projects, open source, and experiments</p>
+        <h2>@Lang.T("Projekt", "Projects")</h2>
+        <p>@Lang.T("Sidoprojekt, öppen källkod och experiment", "Side projects, open source, and experiments")</p>
         <span class="hn-arrow">→</span>
     </a>
     <a class="hn-card" asp-controller="Portfolio" asp-action="Index">
         <span class="hn-icon">▣</span>
         <h2>Portfolio</h2>
-        <p>Websites and work I have built</p>
+        <p>@Lang.T("Webbplatser och arbeten jag har byggt", "Websites and work I have built")</p>
         <span class="hn-arrow">→</span>
     </a>
     <a class="hn-card" asp-controller="About" asp-action="Index">
         <span class="hn-icon">◉</span>
-        <h2>About</h2>
-        <p>Who I am and what drives me</p>
+        <h2>@Lang.T("Om mig", "About")</h2>
+        <p>@Lang.T("Vem jag är och vad som driver mig", "Who I am and what drives me")</p>
         <span class="hn-arrow">→</span>
     </a>
     <a class="hn-card" asp-controller="CV" asp-action="Index">
         <span class="hn-icon">◈</span>
         <h2>CV</h2>
-        <p>Professional background, education, and board roles</p>
+        <p>@Lang.T("Yrkesbakgrund, utbildning och styrelseuppdrag", "Professional background, education, and board roles")</p>
         <span class="hn-arrow">→</span>
     </a>
 </section>
