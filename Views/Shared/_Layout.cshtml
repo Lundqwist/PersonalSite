@@ -60,7 +60,7 @@
             <ul class="nav-links">
                 <li><a asp-area="" asp-controller="Stories" asp-action="Index" class="@ActiveIf("Stories")">Stories</a></li>
                 <li><a asp-area="" asp-controller="Projects" asp-action="Index" class="@ActiveIf("Projects")">Projects</a></li>
-                <li><a asp-area="" asp-controller="Portfolio" asp-action="Index" class="@ActiveIf("Portfolio")">Portfolio</a></li>
+                <li><a asp-area="" asp-controller="Gaming" asp-action="Index" class="@ActiveIf("Gaming")">Gaming</a></li>
                 @* The CV is reached from a button on the About page, so About stays marked there too *@
                 <li><a asp-area="" asp-controller="About" asp-action="Index" class="@(ActiveIf("About") + ActiveIf("CV"))">About</a></li>
                 @* The Admin link is only shown when you are logged in.

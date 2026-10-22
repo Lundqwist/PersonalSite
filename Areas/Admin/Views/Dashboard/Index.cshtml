@@ -30,10 +30,10 @@
             <h2>Projects</h2>
             <p>@Count(ViewData["ProjectCount"], "post", "posts")</p>
         </a>
-        <a class="admin-card admin-tile" asp-controller="Posts" asp-action="Index" asp-route-category="Portfolio">
+        <a class="admin-card admin-tile" asp-controller="Posts" asp-action="Index" asp-route-category="Gaming">
             <span class="hn-icon">▣</span>
-            <h2>Portfolio</h2>
-            <p>@Count(ViewData["PortfolioCount"], "item", "items")</p>
+            <h2>Gaming</h2>
+            <p>@Count(ViewData["GamingCount"], "game", "games")</p>
         </a>
         <a class="admin-card admin-tile" asp-controller="About" asp-action="Index">
             <span class="hn-icon">◉</span>

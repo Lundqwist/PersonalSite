@@ -1,64 +1,75 @@
 @*
-    Views/Shared/PostList.cshtml — the list page for Stories, Projects and Portfolio.
+    Views/Shared/PostList.cshtml — the list page for Stories, Projects and Gaming.
 
     Shared by the three controllers in Controllers/PostCategoryController.cs.
     They pass the posts as the Model and the category in ViewData["Category"];
     the category decides the heading, the image and some details below.
+
+    Gaming is different: no visible headline or image, only the cards (one per
+    game) followed by a card for the Discord server.
 *@
 @using System.Globalization
 @model List<Post>
+@* Settings from appsettings.json, for the Discord invite link *@
+@inject IConfiguration Config
 @{
     // "as PostCategory?" tries to read the value as a category (null if not);
     // "?? PostCategory.Story" falls back to Story.
     var category = ViewData["Category"] as PostCategory? ?? PostCategory.Story;
+    var isGaming = category == PostCategory.Gaming;
 
     // switch expressions pick the texts for this category
     var heading = category switch
     {
         PostCategory.Story => "Stories",
         PostCategory.Project => "Projects",
-        _ => "Portfolio",
+        _ => "Gaming",
     };
     var eyebrow = category switch
     {
         PostCategory.Story => "Thoughts & writing",
         PostCategory.Project => "Side projects & experiments",
-        _ => "Websites & work",
+        _ => "Games I play",
     };
     var icon = category switch { PostCategory.Story => "◇", PostCategory.Project => "◆", _ => "▣" };
     ViewData["Title"] = heading;
+
+    // The invite link to the Discord server (appsettings.json -> Discord:InviteUrl).
+    // While it is empty, the Discord card is shown without a link.
+    var discordUrl = Config["Discord:InviteUrl"];
 }
 
-<div class="page-header page-header--with-actions">
-    <div>
-        <p class="page-eyebrow">@eyebrow</p>
-        <h1>@heading</h1>
-    </div>
-    @* Each page shows an image next to the headline *@
-    @switch (category)
-    {
-        case PostCategory.Story:
+@if (isGaming)
+{
+    @* No visible headline on the Gaming page, but screen readers still get one *@
+    <h1 class="visually-hidden">@heading</h1>
+}
+else
+{
+    <div class="page-header page-header--with-actions">
+        <div>
+            <p class="page-eyebrow">@eyebrow</p>
+            <h1>@heading</h1>
+        </div>
+        @* Each page shows an image next to the headline *@
+        @if (category == PostCategory.Story)
+        {
             <figure class="framed-image framed-image--square page-header-image">
                 <img src="~/images/stories.jpg" asp-append-version="true" width="640" height="640"
                      alt="Illustration of Bjarne writing with a quill by candlelight" />
             </figure>
-            break;
-        case PostCategory.Project:
+        }
+        else
+        {
             <figure class="framed-image framed-image--square page-header-image">
                 <img src="~/images/projects.jpg" asp-append-version="true" width="700" height="640"
                      alt="Illustration of Bjarne building a clockwork mechanism in a workshop" />
             </figure>
-            break;
-        default:
-            <figure class="framed-image framed-image--wide page-header-image">
-                <img src="~/images/portfolio.jpg" asp-append-version="true" width="840" height="560"
-                     alt="Bjarne presenting results at a whiteboard" />
-            </figure>
-            break;
-    }
-</div>
+        }
+    </div>
+}
 
-@if (Model.Count == 0)
+@if (Model.Count == 0 && !isGaming)
 {
     @* Nothing published yet *@
     <div class="empty-page empty-page--compact">
@@ -70,7 +81,7 @@
 }
 else
 {
-    <section class="post-list">
+    <section class="post-list @(isGaming ? "post-list--gaming" : "")">
         @foreach (var post in Model)
         {
             // The cover image, or the first image in the text (see Post.cs)
@@ -87,27 +98,53 @@ else
                         <img src="/media/@thumbId/thumb" alt="" loading="lazy" decoding="async" />
                     </div>
                 }
-                <div class="post-card-meta">
-                    @* <time datetime="2026-10-12"> gives a machine-readable date;
-                       the visible text is e.g. "12 October 2026". *@
-                    <time datetime="@post.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
-                        @post.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
-                    </time>
-                </div>
+                @* Game cards have no date: they are pages, not news *@
+                @if (!isGaming)
+                {
+                    <div class="post-card-meta">
+                        @* <time datetime="2026-10-12"> gives a machine-readable date;
+                           the visible text is e.g. "12 October 2026". *@
+                        <time datetime="@post.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                            @post.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
+                        </time>
+                    </div>
+                }
                 @* lang tells screen readers which language this title is in *@
                 <h2 lang="@post.Language">@post.Title</h2>
                 @if (!string.IsNullOrWhiteSpace(post.Summary))
                 {
                     <p lang="@post.Language">@post.Summary</p>
                 }
-                @if (category == PostCategory.Portfolio && post.UrlHost != null)
-                {
-                    @* The whole card is a link, so the site address is shown as text;
-                       the "Visit site" button is on the item's page *@
-                    <span class="post-card-site">↗ @post.UrlHost</span>
-                }
                 <span class="post-card-more">Read more →</span>
             </a>
+        }
+
+        @if (isGaming)
+        {
+            @* The Discord server card: the image links to the invite.
+               target="_blank" opens Discord in a new tab. *@
+            @if (!string.IsNullOrWhiteSpace(discordUrl))
+            {
+                <a class="post-card post-card--image discord-card" href="@discordUrl" target="_blank" rel="noopener noreferrer">
+                    <div class="post-card-thumb">
+                        <img src="~/images/discord-lundqwist.svg" asp-append-version="true" alt="" loading="lazy" />
+                    </div>
+                    <h2>Discord: Lundqwist.se</h2>
+                    <p>Join my Discord server to chat and play together.</p>
+                    <span class="post-card-more">Join the server ↗</span>
+                </a>
+            }
+            else
+            {
+                <div class="post-card post-card--image discord-card">
+                    <div class="post-card-thumb">
+                        <img src="~/images/discord-lundqwist.svg" asp-append-version="true" alt="" loading="lazy" />
+                    </div>
+                    <h2>Discord: Lundqwist.se</h2>
+                    <p>Join my Discord server to chat and play together.</p>
+                    <span class="post-card-more">Invite link coming soon</span>
+                </div>
+            }
         }
     </section>
 }

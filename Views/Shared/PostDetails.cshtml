@@ -1,5 +1,5 @@
 @*
-    Views/Shared/PostDetails.cshtml — one story, project or portfolio item.
+    Views/Shared/PostDetails.cshtml — one story, project or game page.
     Shared by the three controllers in Controllers/PostCategoryController.cs.
 *@
 @using System.Globalization
@@ -8,14 +8,14 @@
 @* The Markdown converter, provided by dependency injection *@
 @inject MarkdownRenderer Markdown
 @{
-    // Shared by Stories, Projects and Portfolio
+    // Shared by Stories, Projects and Gaming
     var category = Model.Category;
-    var isPortfolio = category == PostCategory.Portfolio;
+    var isGaming = category == PostCategory.Gaming;
     var backText = category switch
     {
         PostCategory.Story => "All stories",
         PostCategory.Project => "All projects",
-        _ => "Whole portfolio",
+        _ => "All games",
     };
     ViewData["Title"] = Model.Title;
 }
@@ -26,30 +26,21 @@
         <a class="post-back" asp-action="Index">← @backText</a>
     </div>
 
-    @* Title card: date, title, summary (and "Visit site" for portfolio
-       items), in the same card style as the text below (.page-card in site.css) *@
+    @* Title card: date, title and summary, in the same card style as the
+       text below (.page-card in site.css). Game pages have no date. *@
     <header class="page-card post-header-card">
-        <div class="post-card-meta">
-            <time datetime="@Model.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
-                @Model.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
-            </time>
-        </div>
+        @if (!isGaming)
+        {
+            <div class="post-card-meta">
+                <time datetime="@Model.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                    @Model.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
+                </time>
+            </div>
+        }
         <h1 lang="@Model.Language">@Model.Title</h1>
         @if (!string.IsNullOrWhiteSpace(Model.Summary))
         {
             <p class="post-lead" lang="@Model.Language">@Model.Summary</p>
-        }
-        @* Portfolio items get a prominent "Visit site" button near the top.
-           target="_blank" opens a new tab; rel="noopener noreferrer" stops the
-           other site from controlling this tab (a security precaution). *@
-        @if (isPortfolio && !string.IsNullOrWhiteSpace(Model.Url))
-        {
-            <p class="post-visit">
-                <a class="btn btn-primary" href="@Model.Url" target="_blank" rel="noopener noreferrer">
-                    Visit site ↗
-                </a>
-                <span class="post-visit-host">@Model.UrlHost</span>
-            </p>
         }
     </header>
 
@@ -68,12 +59,14 @@
         <div class="post-body prose page-card" lang="@Model.Language">@Markdown.Render(Model.Body)</div>
     }
 
-    @* The link again at the bottom *@
+    @* The link at the bottom. target="_blank" opens a new tab;
+       rel="noopener noreferrer" stops the other site from controlling this
+       tab (a security precaution). *@
     @if (!string.IsNullOrWhiteSpace(Model.Url))
     {
         <p class="post-link">
             <a href="@Model.Url" target="_blank" rel="noopener noreferrer">
-                @(isPortfolio ? "Visit site" : "Open link") ↗
+                @(isGaming ? "Official website" : "Open link") ↗
             </a>
         </p>
     }

@@ -1,8 +1,8 @@
 # lundqwist.se — Personal Site
 
-The personal website of **Bjarne M. Lundqwist**: CV, stories, projects, portfolio
-and an About page, in Swedish and English, with an admin area for editing all
-content.
+The personal website of **Bjarne M. Lundqwist**: CV, stories, projects, gaming
+and an About page, in English (the CV also in Swedish), with an admin area for
+editing all content.
 
 Built with **C# / ASP.NET Core 8 MVC**, **Entity Framework Core** and **MariaDB**
 (running on a Synology DS220+).
@@ -16,7 +16,7 @@ Built with **C# / ASP.NET Core 8 MVC**, **Entity Framework Core** and **MariaDB*
 All content on this website is the property of Bjarne M. Lundqwist and is
 protected by copyright. This includes, but is not limited to:
 
-- all texts (CV, stories, projects, portfolio and About page),
+- all texts (CV, stories, projects, game pages and About page),
 - all photographs and illustrations, including the images in `wwwroot/images/`
   and every image uploaded through the admin pages,
 - the CV document in `Data/` and the personal and contact information,
@@ -46,6 +46,12 @@ Their copyright remains with their respective authors.
 | Bootstrap Icons 1.11.3 | Footer icons (email, LinkedIn, Discord, location) | MIT |
 | Bootstrap, jQuery, jQuery Validation (`wwwroot/lib/`) | Included by the project template | MIT |
 | Playfair Display, Inter (Google Fonts) | Typefaces, loaded from Google's servers (see `/Privacy`) | SIL Open Font License 1.1 |
+| QuestPDF | Building the CV PDF | QuestPDF Community License |
+| Lato (`Fonts/`) | Typeface in the CV PDF | SIL Open Font License 1.1 |
+
+World of Warcraft, No Man's Sky, Terraria and Minecraft are trademarks of their
+respective owners. The illustrations on the game pages are original artwork,
+not official game art.
 
 The full license texts are in each package and in `wwwroot/lib/*/LICENSE*`.
 
@@ -58,38 +64,40 @@ The pages, in menu order:
 | Page | Address | Content |
 |---|---|---|
 | Home | `/` | Welcome text, portrait and links to all sections |
-| Stories | `/Stories` | Texts, each written in Swedish (SE) or English (EN) |
-| Projects | `/Projects` | Side projects, each SE or EN |
-| Portfolio | `/Portfolio` | Websites and work, with a "Visit site" link |
-| About | `/About` | About text in English, with optional Swedish version |
-| CV | `/CV` | Jobs, courses, education and board roles; notes and courses taught appear when you hover over a card |
+| Stories | `/Stories` | Texts and thoughts |
+| Projects | `/Projects` | Side projects and experiments |
+| Gaming | `/Gaming` | Only cards: one per game (each with its own page) and one for the Discord server |
+| About | `/About` | About text, with a "View my CV" button |
+| CV | `/CV` | Jobs, courses, education and board roles in English or Swedish, with a PDF download (`/CV/Pdf?lang=en` or `sv`); notes and courses taught appear when you hover over a card |
 | Admin | `/Admin` | Log in to add and edit all of the above (menu link shown only when logged in) |
 | Privacy & cookies | `/Privacy` | Which cookies the site uses, and why (linked from the footer and the cookie notice) |
 | Showcase | `/showcase/…` | Your own files and small static websites, to link to from posts (see *The showcase folder*) |
 
 **Layout.** Every page has the same frame: the menu bar with the Lundqwist logo
 (its letters sit on the bar's bottom line, the q's tail hangs below it) and the
-**SV | EN** switch, and the footer with contact details. On phones the menu
-becomes two rows: logo + language switch, then the links.
+footer with contact details. On phones the menu becomes two rows: the logo,
+then the links.
 
-A single story, project or portfolio item shows two cards: a title card (date,
-SE/EN tag, title, summary, and "Visit site" for portfolio items) and a text card.
-The About page shows its text in the same kind of card.
+A single story, project or game page shows two cards: a title card (date — not
+on game pages —, title and summary) and a text card. The About page shows its
+text in the same kind of card.
 
-**Languages.** Swedish is the default. The **SV | EN** switch in the menu bar
-changes all texts on every page and is remembered in a cookie. Stories, projects
-and portfolio items are written in one language each and show an **SE** or
-**EN** tag.
+**Languages.** The site is in English. Only the CV has an **English | Svenska**
+switch; the choice is in the address (`/CV?lang=sv`), so no cookie is needed.
 
-**Cookies.** Only necessary cookies are used: the language choice, and the
-admin login, form protection and confirmation messages, which only affect the
-logged-in admin. There is no tracking or analytics, so no consent is needed. A
+**Discord.** The Discord card on the Gaming page links to the invite in
+`appsettings.json` → `Discord:InviteUrl`. While that is empty, the card shows
+"Invite link coming soon".
+
+**Cookies.** Visitors get no cookies. The only cookies are the admin login,
+form protection and confirmation messages, which only affect the logged-in
+admin. There is no tracking or analytics, so no consent is needed. A
 small notice at the bottom of the page says so and links to `/Privacy`; clicking
 OK hides it for good (remembered in the browser's localStorage, not a cookie).
 If you add a cookie, update the table in `Views/Home/Privacy.cshtml`.
 
 **Admin.** After logging in you can add, edit and delete CV entries, stories,
-projects and portfolio items, and edit the About page. Text is written in
+projects and game pages, and edit the About page. Text is written in
 **Markdown** with a formatting toolbar and preview. Images are uploaded in the
 editor; they are resized in the browser (max 1600 px), converted to WebP,
 stripped of hidden metadata such as GPS position, and stored in the database.
@@ -161,9 +169,11 @@ PersonalSite/
 │   ├── CvSeedData.cs            The original CV content (used once by migrations)
 │   └── Bjarne_Lundqwist_CV.pdf  The CV document
 ├── Services/
-│   └── MarkdownRenderer.cs      Markdown → safe HTML
-├── Controllers/                 Public pages (Home + Privacy, CV, Stories/Projects/
-│                                Portfolio, About, Language switch, image serving)
+│   ├── MarkdownRenderer.cs      Markdown → safe HTML
+│   └── CvPdfBuilder.cs          The CV as a PDF
+├── Fonts/                       Lato, for the CV PDF
+├── Controllers/                 Public pages (Home + Privacy, CV + PDF, Stories/Projects/
+│                                Gaming, About, image serving)
 ├── Views/                       Public HTML templates (Razor .cshtml)
 │   └── Shared/                  Layout, footer, post list/details, language switch,
 │                                cookie notice and other partials
@@ -238,7 +248,8 @@ Everything is edited in the admin area — no code changes needed:
 | What | Where |
 |---|---|
 | CV entries | Admin → CV |
-| Stories, projects, portfolio | Admin → Stories / Projects / Portfolio |
+| Stories, projects, game pages | Admin → Stories / Projects / Gaming |
+| Discord invite link | `Discord:InviteUrl` in `appsettings.json`, then deploy |
 | About page | Admin → About |
 | Images | The *Images* section of each editor |
 

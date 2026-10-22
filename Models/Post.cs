@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// Models/Post.cs — a story, project or portfolio item.
+// Models/Post.cs — a story, project or game page.
 //
 // All three kinds are stored in the same database table ("Posts") and told
 // apart by the Category column. Each post is written in one language.
@@ -9,13 +9,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PersonalSite.Models;
 
-// The kinds of posts. Stored as text ("Story", "Project", "Portfolio") in the
+// The kinds of posts. Stored as text ("Story", "Project", "Gaming") in the
 // database (see AppDbContext), so adding a new kind needs no database change.
 public enum PostCategory
 {
     Story,
     Project,
-    Portfolio
+    Gaming
 }
 
 // Names used for each category on the site and in the admin pages.
@@ -32,7 +32,7 @@ public static class PostCategoryInfo
     {
         PostCategory.Story => "Stories",
         PostCategory.Project => "Projects",
-        _ => "Portfolio",
+        _ => "Gaming",
     };
 
     // Admin labels (English)
@@ -40,7 +40,7 @@ public static class PostCategoryInfo
     {
         PostCategory.Story => "Stories",
         PostCategory.Project => "Projects",
-        _ => "Portfolio",
+        _ => "Gaming",
     };
 
     // Used in phrases like "+ New story" and "Edit project".
@@ -48,7 +48,7 @@ public static class PostCategoryInfo
     {
         PostCategory.Story => "story",
         PostCategory.Project => "project",
-        _ => "portfolio item",
+        _ => "game",
     };
 }
 
@@ -88,7 +88,7 @@ public class Post
 
     public MediaImage? CoverImage { get; set; }
 
-    // Optional link, e.g. a project's repository or a portfolio site.
+    // Optional link, e.g. a project's repository or a game's website.
     // [Url] only accepts http(s)/ftp addresses, which also blocks dangerous
     // "javascript:" links.
     [MaxLength(500), Url]

@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// Controllers/PostCategoryController.cs — Stories, Projects and Portfolio.
+// Controllers/PostCategoryController.cs — Stories, Projects and Gaming.
 //
 // The three pages work exactly the same, they just show different posts.
 // So the logic is written once in an "abstract base class", and three tiny
@@ -7,7 +7,7 @@
 //
 //   /Stories              -> StoriesController.Index    (list)
 //   /Stories/Details/7    -> StoriesController.Details  (one post)
-//   /Projects, /Portfolio -> the same, for their category
+//   /Projects, /Gaming    -> the same, for their category
 //
 // All three use the shared views Views/Shared/PostList.cshtml and PostDetails.cshtml.
 // ════════════════════════════════════════════════════════════════════════════
@@ -78,8 +78,8 @@ public class ProjectsController : PostCategoryController
     protected override PostCategory Category => PostCategory.Project;
 }
 
-public class PortfolioController : PostCategoryController
+public class GamingController : PostCategoryController
 {
-    public PortfolioController(AppDbContext db) : base(db) { }
-    protected override PostCategory Category => PostCategory.Portfolio;
+    public GamingController(AppDbContext db) : base(db) { }
+    protected override PostCategory Category => PostCategory.Gaming;
 }

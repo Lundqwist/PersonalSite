@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// Areas/Admin/Controllers/PostsController.cs — admin for Stories, Projects and Portfolio.
+// Areas/Admin/Controllers/PostsController.cs — admin for Stories, Projects and Gaming.
 //
 // One controller handles all three; "category" in the URL says which:
 //   GET  /Admin/Posts?category=Story              list of stories

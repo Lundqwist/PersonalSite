@@ -27,7 +27,7 @@
 
    ORDER OF THIS FILE
    Colors (tokens) → reset → header → hero (front page) → page headers → CV →
-   stories/projects/portfolio → footer → admin (buttons, forms, editor) →
+   stories/projects/gaming → footer → admin (buttons, forms, editor) →
    responsive (phone/tablet) rules → card frame (kept last on purpose).
    ════════════════════════════════════════════════════════════════════════════ */
 
@@ -297,41 +297,19 @@ ul { list-style: none; }
 /* Every header image has the SAME height (--header-img-h, set on .page-header);
    its width follows from its shape (square, wide or landscape). Together with
    the text block's min-height below, the headline starts on the same spot on
-   Stories, Projects, Portfolio, About and CV (which has no image). */
-/* Button under a page headline (e.g. "View my CV" on About).
-   align-self keeps it button-sized inside the column header. */
-.page-header-btn {
-    align-self: flex-start;
-    margin-top: 1rem;
-}
-
+   Stories, Projects, About and CV (which has no image). */
 .page-header-image {
     height: var(--header-img-h);
     width: auto;
     flex-shrink: 0;
 }
 
-/* Site address on portfolio cards */
-.post-card-site {
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--accent);
+/* Button under a page headline (e.g. "View my CV" on About).
+   align-self keeps it button-sized inside the column header. */
+.page-header-btn {
+    align-self: flex-start;
+    margin-top: 1rem;
 }
-
-/* "Visit site" button on a portfolio item */
-.post-visit {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
-}
-
-.post-visit-host {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
 
 .hero-eyebrow {
     font-size: 0.8rem;
@@ -991,6 +969,13 @@ ul { list-style: none; }
 }
 
 .post-card:hover .post-card-thumb img { transform: scale(1.03); }
+
+/* The Gaming page has no page header, so the cards start a bit lower */
+.post-list--gaming { padding-top: 3rem; }
+
+/* The Discord card without an invite link yet is not clickable: no hover lift */
+div.discord-card:hover { transform: none; box-shadow: var(--card-shadow); border-color: var(--card-border); }
+div.discord-card:hover .post-card-thumb img { transform: none; }
 
 .post-link { margin-top: 2rem; }
 

@@ -14,7 +14,7 @@
 @{
     var isNew = Model.Id == 0;
     var noun = Model.Category.AdminNoun();
-    var isPortfolio = Model.Category == PostCategory.Portfolio;
+    var isGaming = Model.Category == PostCategory.Gaming;
     var heading = isNew ? $"New {noun}" : $"Edit {noun}";
     ViewData["Title"] = $"Admin · {heading}";
     ViewData["Category"] = Model.Category;
@@ -97,10 +97,10 @@
         </fieldset>
 
         <div class="form-field">
-            <label asp-for="Url">@(isPortfolio ? "Website address" : "Link (optional)")</label>
+            <label asp-for="Url">Link (optional)</label>
             <input asp-for="Url" type="url" placeholder="https://" />
-            <span class="form-hint">@(isPortfolio
-                ? "The site this item showcases. Shown on the card and as a \"Visit site\" button."
+            <span class="form-hint">@(isGaming
+                ? "The game's official website, shown at the bottom of the page."
                 : "For example a GitHub repository or a demo.")</span>
             <span asp-validation-for="Url" class="form-error"></span>
         </div>

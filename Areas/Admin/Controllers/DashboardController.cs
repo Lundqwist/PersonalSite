@@ -26,7 +26,7 @@ public class DashboardController : AdminControllerBase
         ViewData["CvCount"] = await _db.CvEntries.CountAsync();
         ViewData["StoryCount"] = await _db.Posts.CountAsync(p => p.Category == PostCategory.Story);
         ViewData["ProjectCount"] = await _db.Posts.CountAsync(p => p.Category == PostCategory.Project);
-        ViewData["PortfolioCount"] = await _db.Posts.CountAsync(p => p.Category == PostCategory.Portfolio);
+        ViewData["GamingCount"] = await _db.Posts.CountAsync(p => p.Category == PostCategory.Gaming);
 
         // When the About page was last saved ("?." gives null if there is no About page yet).
         ViewData["AboutUpdated"] = (await _db.PageContents.FirstOrDefaultAsync(p => p.Key == PageContent.AboutKey))?.UpdatedAt;
