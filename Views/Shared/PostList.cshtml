@@ -12,18 +12,18 @@
     // "?? PostCategory.Story" falls back to Story.
     var category = ViewData["Category"] as PostCategory? ?? PostCategory.Story;
 
-    // switch expressions pick the texts for this category, in the current language
+    // switch expressions pick the texts for this category
     var heading = category switch
     {
-        PostCategory.Story => Lang.T("Berättelser", "Stories"),
-        PostCategory.Project => Lang.T("Projekt", "Projects"),
-        _ => Lang.T("Portfolio", "Portfolio"),
+        PostCategory.Story => "Stories",
+        PostCategory.Project => "Projects",
+        _ => "Portfolio",
     };
     var eyebrow = category switch
     {
-        PostCategory.Story => Lang.T("Tankar & texter", "Thoughts & writing"),
-        PostCategory.Project => Lang.T("Sidoprojekt & experiment", "Side projects & experiments"),
-        _ => Lang.T("Webbplatser & uppdrag", "Websites & work"),
+        PostCategory.Story => "Thoughts & writing",
+        PostCategory.Project => "Side projects & experiments",
+        _ => "Websites & work",
     };
     var icon = category switch { PostCategory.Story => "◇", PostCategory.Project => "◆", _ => "▣" };
     ViewData["Title"] = heading;
@@ -34,26 +34,25 @@
         <p class="page-eyebrow">@eyebrow</p>
         <h1>@heading</h1>
     </div>
-    @* Each page shows an image next to the headline; posts are tagged SE/EN
-       individually, so there is no language switch here *@
+    @* Each page shows an image next to the headline *@
     @switch (category)
     {
         case PostCategory.Story:
             <figure class="framed-image framed-image--square page-header-image">
                 <img src="~/images/stories.jpg" asp-append-version="true" width="640" height="640"
-                     alt="@Lang.T("Illustration av Bjarne som skriver med fjäderpenna vid ett levande ljus", "Illustration of Bjarne writing with a quill by candlelight")" />
+                     alt="Illustration of Bjarne writing with a quill by candlelight" />
             </figure>
             break;
         case PostCategory.Project:
             <figure class="framed-image framed-image--square page-header-image">
                 <img src="~/images/projects.jpg" asp-append-version="true" width="700" height="640"
-                     alt="@Lang.T("Illustration av Bjarne som bygger en kugghjulsmekanism i en verkstad", "Illustration of Bjarne building a clockwork mechanism in a workshop")" />
+                     alt="Illustration of Bjarne building a clockwork mechanism in a workshop" />
             </figure>
             break;
         default:
             <figure class="framed-image framed-image--wide page-header-image">
                 <img src="~/images/portfolio.jpg" asp-append-version="true" width="840" height="560"
-                     alt="@Lang.T("Bjarne presenterar resultat vid en whiteboard", "Bjarne presenting results at a whiteboard")" />
+                     alt="Bjarne presenting results at a whiteboard" />
             </figure>
             break;
     }
@@ -65,7 +64,7 @@
     <div class="empty-page empty-page--compact">
         <div class="empty-inner">
             <span class="empty-icon" aria-hidden="true">@icon</span>
-            <p>@Lang.T("Inget publicerat ännu.", "Nothing published yet.")</p>
+            <p>Nothing published yet.</p>
         </div>
     </div>
 }
@@ -90,12 +89,10 @@ else
                 }
                 <div class="post-card-meta">
                     @* <time datetime="2026-10-12"> gives a machine-readable date;
-                       the visible text uses the visitor's language. *@
+                       the visible text is e.g. "12 October 2026". *@
                     <time datetime="@post.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
                         @post.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
                     </time>
-                    @* The SE/EN tag (Views/Shared/_LangTag.cshtml), with this post as its model *@
-                    <partial name="_LangTag" model="post" />
                 </div>
                 @* lang tells screen readers which language this title is in *@
                 <h2 lang="@post.Language">@post.Title</h2>
@@ -109,7 +106,7 @@ else
                        the "Visit site" button is on the item's page *@
                     <span class="post-card-site">↗ @post.UrlHost</span>
                 }
-                <span class="post-card-more">@Lang.T("Läs mer", "Read more") →</span>
+                <span class="post-card-more">Read more →</span>
             </a>
         }
     </section>

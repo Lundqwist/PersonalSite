@@ -21,7 +21,7 @@
         @* aria-labelledby links the section to its heading, for screen readers.
            <address> is the HTML element meant for contact information. *@
         <section class="footer-col" aria-labelledby="footer-address-heading">
-            <h2 class="footer-heading" id="footer-address-heading">@Lang.T("Adress", "Address")</h2>
+            <h2 class="footer-heading" id="footer-address-heading">Address</h2>
             <div class="footer-item">
                 <svg class="footer-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
@@ -31,13 +31,13 @@
                     Bjarne M. Lundqwist<br />
                     Gustavsbergsgatan 6B<br />
                     571 33 Nässjö<br />
-                    @Lang.T("Sverige", "Sweden")
+                    Sweden
                 </address>
             </div>
         </section>
 
         <section class="footer-col" aria-labelledby="footer-contact-heading">
-            <h2 class="footer-heading" id="footer-contact-heading">@Lang.T("Kontakt", "Contact")</h2>
+            <h2 class="footer-heading" id="footer-contact-heading">Contact</h2>
             <ul class="footer-links">
                 <li>
                     @* "mailto:" links open the visitor's email program *@
@@ -45,7 +45,7 @@
                         <svg class="footer-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
                         </svg>
-                        <span><span class="visually-hidden">@Lang.T("E-post:", "Email:") </span>bjarne@lundqwist.se</span>
+                        <span><span class="visually-hidden">Email: </span>bjarne@lundqwist.se</span>
                     </a>
                 </li>
                 <li>
@@ -65,8 +65,8 @@
                         </svg>
                         <span><span class="visually-hidden">Discord: </span>Lundqwist</span>
                         <button type="button" class="footer-copy" data-copy="Lundqwist"
-                                data-copied-text="@Lang.T("Kopierat!", "Copied!")"
-                                aria-label="@Lang.T("Kopiera Discord-namnet", "Copy Discord username")">@Lang.T("Kopiera", "Copy")</button>
+                                data-copied-text="Copied!"
+                                aria-label="Copy Discord username">Copy</button>
                     </div>
                 </li>
             </ul>
@@ -75,7 +75,7 @@
 
     <div class="footer-bottom">
         @* &copy; is the HTML code for the © sign. The year updates automatically. *@
-        <span>&copy; @DateTime.Now.Year Bjarne M. Lundqwist. @Lang.T("Alla rättigheter förbehållna.", "All rights reserved.")</span>
-        <a class="footer-privacy" asp-area="" asp-controller="Home" asp-action="Privacy">@Lang.T("Integritet & cookies", "Privacy & cookies")</a>
+        <span>&copy; @DateTime.Now.Year Bjarne M. Lundqwist. All rights reserved.</span>
+        <a class="footer-privacy" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy & cookies</a>
     </div>
 </footer>

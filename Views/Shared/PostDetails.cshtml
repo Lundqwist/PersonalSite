@@ -13,9 +13,9 @@
     var isPortfolio = category == PostCategory.Portfolio;
     var backText = category switch
     {
-        PostCategory.Story => Lang.T("Alla berättelser", "All stories"),
-        PostCategory.Project => Lang.T("Alla projekt", "All projects"),
-        _ => Lang.T("Hela portfolion", "Whole portfolio"),
+        PostCategory.Story => "All stories",
+        PostCategory.Project => "All projects",
+        _ => "Whole portfolio",
     };
     ViewData["Title"] = Model.Title;
 }
@@ -26,14 +26,13 @@
         <a class="post-back" asp-action="Index">← @backText</a>
     </div>
 
-    @* Title card: date, SE/EN tag, title, summary (and "Visit site" for portfolio
+    @* Title card: date, title, summary (and "Visit site" for portfolio
        items), in the same card style as the text below (.page-card in site.css) *@
     <header class="page-card post-header-card">
         <div class="post-card-meta">
             <time datetime="@Model.PublishedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
                 @Model.PublishedDate.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
             </time>
-            <partial name="_LangTag" model="Model" />
         </div>
         <h1 lang="@Model.Language">@Model.Title</h1>
         @if (!string.IsNullOrWhiteSpace(Model.Summary))
@@ -47,7 +46,7 @@
         {
             <p class="post-visit">
                 <a class="btn btn-primary" href="@Model.Url" target="_blank" rel="noopener noreferrer">
-                    @Lang.T("Besök webbplatsen", "Visit site") ↗
+                    Visit site ↗
                 </a>
                 <span class="post-visit-host">@Model.UrlHost</span>
             </p>
@@ -74,7 +73,7 @@
     {
         <p class="post-link">
             <a href="@Model.Url" target="_blank" rel="noopener noreferrer">
-                @(isPortfolio ? Lang.T("Besök webbplatsen", "Visit site") : Lang.T("Öppna länk", "Open link")) ↗
+                @(isPortfolio ? "Visit site" : "Open link") ↗
             </a>
         </p>
     }

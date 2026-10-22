@@ -141,8 +141,8 @@ HTML sent back to the browser, which loads site.css, site.js and images
 | Razor views and tag helpers | `Views/Shared/_Layout.cshtml` |
 | Areas | `Areas/Admin/` |
 | Authentication (cookie login) | `Program.cs`, `Areas/Admin/Controllers/AccountController.cs` |
-| Security: antiforgery, XSS, open redirects | `Program.cs`, `Services/MarkdownRenderer.cs`, `Controllers/LanguageController.cs` |
-| Partial views (reused HTML pieces) | `Views/Shared/_LangSwitch.cshtml`, `_CookieNotice.cshtml`, `_Footer.cshtml` |
+| Security: antiforgery, XSS, open redirects | `Program.cs`, `Services/MarkdownRenderer.cs` |
+| Partial views (reused HTML pieces) | `Views/Shared/_CookieNotice.cshtml`, `_Footer.cshtml` |
 | Serving an extra folder of files | The *showcase* block in `Program.cs` |
 | CSS custom properties ("tokens") | The top of `wwwroot/css/site.css`: cards re-point the shared colors |
 
@@ -153,7 +153,6 @@ HTML sent back to the browser, which loads site.css, site.js and images
 ```
 PersonalSite/
 ├── Program.cs                   Start-up: services, middleware, routes
-├── Lang.cs                      Helper for Swedish/English texts
 ├── appsettings.json             Settings, incl. the database connection string
 ├── setup_db.sql                 Creates the database and its user on the NAS
 ├── Models/                      Data classes (one per database table)

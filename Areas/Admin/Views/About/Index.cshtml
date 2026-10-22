@@ -1,7 +1,6 @@
 @*
-    Areas/Admin/Views/About/Index.cshtml — the About page editor. English on the
-    left (main text), Swedish on the right (optional). Same toolbar, preview and
-    image library as the post editor, without a cover image.
+    Areas/Admin/Views/About/Index.cshtml — the About page editor. Same toolbar,
+    preview and image library as the post editor, without a cover image.
 *@
 @model PageContent
 @{
@@ -19,27 +18,13 @@
           data-preview-url="@Url.Action("Preview", "Posts", new { area = "Admin" })">
         <div asp-validation-summary="ModelOnly" class="form-error" role="alert"></div>
 
-        <fieldset class="form-langs">
-            <legend class="visually-hidden">Text</legend>
-            <div class="form-lang-head"><span>English</span><span>Svenska <small>(optional, falls back to English)</small></span></div>
+        <div class="form-field">
+            <label asp-for="Title">Heading</label>
+            <input asp-for="Title" placeholder="About me" />
+        </div>
 
-            <div class="form-row">
-                <div class="form-field">
-                    <label asp-for="Title">Heading</label>
-                    <input asp-for="Title" placeholder="About me" />
-                </div>
-                <div class="form-field">
-                    <label asp-for="TitleSv">Heading (Swedish)</label>
-                    <input asp-for="TitleSv" placeholder="Om mig" />
-                </div>
-            </div>
-
-            <div class="form-row">
-                <partial name="_MarkdownField" model="@(("Body", "Text", Model.Body))" />
-                <partial name="_MarkdownField" model="@(("BodySv", "Text (Swedish)", Model.BodySv))" />
-            </div>
-            <partial name="_FormattingHelp" />
-        </fieldset>
+        <partial name="_MarkdownField" model="@(("Body", "Text", Model.Body))" />
+        <partial name="_FormattingHelp" />
 
         <partial name="_MediaLibrary" model="@((images, false))" />
 

@@ -107,7 +107,6 @@ ul { list-style: none; }
 /* Elements drawn on deep blue: switch text, accent and border colors so
    every rule inside them stays readable. */
 .cv-count,
-.lang-switch,
 .prose pre {
     --text: var(--on-surface);
     --text-muted: var(--on-surface-muted);
@@ -298,6 +297,13 @@ ul { list-style: none; }
    its width follows from its shape (square, wide or landscape). Together with
    the text block's min-height below, the headline starts on the same spot on
    Stories, Projects, Portfolio, About and CV (which has no image). */
+/* Button under a page headline (e.g. "View my CV" on About).
+   align-self keeps it button-sized inside the column header. */
+.page-header-btn {
+    align-self: flex-start;
+    margin-top: 1rem;
+}
+
 .page-header-image {
     height: var(--header-img-h);
     width: auto;
@@ -360,7 +366,7 @@ ul { list-style: none; }
 /* ── Home nav grid ───────────────────────────────────── */
 .home-nav-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     max-width: 1100px;
     margin: 0 auto;
@@ -669,60 +675,6 @@ ul { list-style: none; }
     flex-direction: column;
     justify-content: center;
 }
-
-.lang-switch {
-    display: inline-flex;
-    padding: 0.25rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-}
-
-.lang-switch a {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-decoration: none;
-    padding: 0.4rem 0.9rem;
-    border-radius: 999px;
-    transition: color 0.2s, background 0.2s;
-}
-
-.lang-switch a:hover { color: var(--text); }
-
-.lang-switch a.active {
-    background: var(--surface2);
-    color: var(--accent-lt);
-}
-
-.lang-switch a:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-}
-
-/* The small SV | EN switch in the menu bar: inverted against the light bar,
-   a navy pill with light text; the chosen language is light orange with dark
-   text (contrast 12:1 and 9:1). Fixed colors, because the menu bar re-points
-   the shared tokens to its own light palette. */
-.lang-switch--nav {
-    flex-shrink: 0;
-    background: #0E2D57;
-    border-color: #0E2D57;
-}
-.lang-switch--nav a {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 0.3rem 0.65rem;
-    color: #EAF1FA;
-}
-.lang-switch--nav a:hover { color: #FFFFFF; background: #1A3A63; }
-.lang-switch--nav a.active,
-.lang-switch--nav a.active:hover {
-    background: var(--card-bg);
-    color: var(--card-text);
-}
-.lang-switch--nav a:focus-visible { outline-color: #0E2D57; }
 
 /* ── Empty pages ─────────────────────────────────────── */
 .empty-page {
@@ -1761,7 +1713,7 @@ a.footer-item:focus-visible,
     .footer-brand { grid-column: 1 / -1; }
 
     .home-nav-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -1827,13 +1779,12 @@ a.footer-item:focus-visible,
         row-gap: 0.25rem;
     }
 
-    /* Phones: two rows. Row 1 = a smaller logo + the SV | EN switch,
-       row 2 = the menu links. The row gap leaves room for the q's tail. */
+    /* Phones: two rows. Row 1 = a smaller logo, row 2 = the menu links.
+       The row gap leaves room for the q's tail. */
     .nav-container { flex-wrap: wrap; row-gap: 1.1rem; }
     .nav-brand,
     .nav-brand img { width: 130px; }
     .nav-brand { height: 44px; }
-    .lang-switch--nav { margin-left: auto; }
     .nav-links {
         order: 3;
         width: 100%;

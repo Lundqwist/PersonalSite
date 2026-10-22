@@ -5,19 +5,19 @@
 *@
 @model ErrorViewModel
 @{
-    ViewData["Title"] = Lang.T("Fel", "Error");
+    ViewData["Title"] = "Error";
 }
 
 <div class="empty-page">
     <div class="empty-inner">
         <span class="empty-icon" aria-hidden="true">⚠</span>
-        <h1>@Lang.T("Något gick fel", "Something went wrong")</h1>
-        <p>@Lang.T("Sidan kunde inte visas just nu. Försök igen om en stund.", "The page could not be shown right now. Please try again in a moment.")</p>
+        <h1>Something went wrong</h1>
+        <p>The page could not be shown right now. Please try again in a moment.</p>
         @* The request id helps find the error in the server's log *@
         @if (Model.ShowRequestId)
         {
             <p class="form-hint">Request ID: <code>@Model.RequestId</code></p>
         }
-        <p><a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">@Lang.T("Till startsidan", "Go to the home page")</a></p>
+        <p><a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Index">Go to the home page</a></p>
     </div>
 </div>

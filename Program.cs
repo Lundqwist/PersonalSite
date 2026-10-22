@@ -202,11 +202,10 @@ if (!string.IsNullOrWhiteSpace(showcasePath) && Directory.Exists(showcasePath))
     });
 }
 
-// Language: Swedish (sv-SE) is the default. A visitor gets English when they
-// pick it with the language switch (saved in a cookie by LanguageController)
-// or when their browser asks for English. This sets CultureInfo.CurrentCulture,
-// which Lang.cs reads, and which also controls date formats ("aug." vs "Aug").
-var supportedCultures = new[] { "sv-SE", "en-US" };
+// Language: the site is English only. This sets CultureInfo.CurrentCulture to
+// en-US for every request, which controls date formats ("Aug 2022",
+// "12 October 2026") whatever the server's own settings are.
+var supportedCultures = new[] { "en-US" };
 app.UseRequestLocalization(new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
     .AddSupportedCultures(supportedCultures)

@@ -12,16 +12,13 @@
 @using System.Globalization
 @model Dictionary<CvEntryType, List<CvEntry>>
 @{
-    // true when the visitor has chosen English
-    var en = Lang.IsEnglish;
-
-    // Short alias so the view can write T("Svenska", "English")
-    string T(string sv, string english) => Lang.T(sv, english);
+    // The site is English only: show each entry's English text (see CvEntry.cs)
+    const bool en = true;
 
     ViewData["Title"] = "CV";
 
-    // "aug. 2022" in Swedish, "Aug 2022" in English: the month format follows
-    // the current language (CultureInfo.CurrentCulture). "—" when there is no date.
+    // e.g. "Aug 2022" (CultureInfo.CurrentCulture is en-US, see Program.cs).
+    // "—" when there is no date.
     string FormatDate(DateOnly? date)
     {
         if (date == null) return "—";
@@ -34,7 +31,7 @@
     {
         if (!string.IsNullOrWhiteSpace(e.DisplayDate)) return e.DisplayDate;
         var start = FormatDate(e.StartDate);
-        var end = e.IsCurrent ? T("pågående", "Present") : FormatDate(e.EndDate);
+        var end = e.IsCurrent ? "Present" : FormatDate(e.EndDate);
         return $"{start} – {end}";
     }
 
@@ -42,10 +39,10 @@
     // Each item is a "tuple" — a small group of values without a named class.
     var sections = new[]
     {
-        (CvEntryType.Workplace, T("Arbetsplatser", "Workplaces"),            "◈"),
-        (CvEntryType.Course,    T("Kurser", "Courses"),                      "◇"),
-        (CvEntryType.School,    T("Utbildningar", "Education"),              "◆"),
-        (CvEntryType.Board,     T("Styrelser & kommittéer", "Boards & Committees"), "◉"),
+        (CvEntryType.Workplace, "Workplaces",          "◈"),
+        (CvEntryType.Course,    "Courses",             "◇"),
+        (CvEntryType.School,    "Education",           "◆"),
+        (CvEntryType.Board,     "Boards & Committees", "◉"),
     };
 }
 
@@ -54,7 +51,6 @@
         <p class="page-eyebrow">Portfolio</p>
         <h1>Curriculum Vitae</h1>
     </div>
-    @* The language is chosen with the SV | EN switch in the menu bar *@
 </div>
 
 @* Loop over the sections. "var (type, label, icon)" unpacks each tuple
@@ -75,7 +71,7 @@
         <div class="cv-grid">
             @foreach (var entry in entries)
             {
-                // Pick the Swedish or English text once per card (see CvEntry.cs)
+                // The English text, or the original when it has no translation (see CvEntry.cs)
                 var organization = entry.GetOrganization(en);
                 var location = entry.GetLocation(en);
                 var courses = entry.GetCourses(en);
@@ -94,7 +90,7 @@
                             </div>
                             @if (entry.IsCurrent)
                             {
-                                <span class="cv-badge">@T("Pågående", "Current")</span>
+                                <span class="cv-badge">Current</span>
                             }
                         </div>
                         <div class="cv-card-meta">
@@ -123,7 +119,7 @@
                                 {
                                     @* "Courses taught" for jobs, "Courses" for education *@
                                     <p class="cv-comment-label">
-                                        @(entry.Type == CvEntryType.Workplace ? T("Undervisade kurser", "Courses taught") : T("Kurser", "Courses"))
+                                        @(entry.Type == CvEntryType.Workplace ? "Courses taught" : "Courses")
                                     </p>
                                     <ul class="cv-course-list">
                                         @foreach (var course in courses)
@@ -134,7 +130,7 @@
                                 }
                                 @if (!string.IsNullOrWhiteSpace(comment))
                                 {
-                                    <p class="cv-comment-label">@T("Anteckningar", "Notes")</p>
+                                    <p class="cv-comment-label">Notes</p>
                                     @* Line breaks in the notes are kept by CSS (white-space: pre-line) *@
                                     <p class="cv-comment-text">@comment</p>
                                 }

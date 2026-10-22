@@ -9,26 +9,23 @@
    parameter in a controller. Here: the Markdown converter. *@
 @inject MarkdownRenderer Markdown
 @{
-    // English is the main text; Swedish is shown when chosen and filled in
-    var en = Lang.IsEnglish;
-    var title = Model?.GetTitle(en);
-    var body = Model?.GetBody(en);
-    // Which language the shown text is actually in (for the lang attribute)
-    var contentLang = !en && !string.IsNullOrWhiteSpace(Model?.BodySv) ? "sv" : "en";
-    ViewData["Title"] = Lang.T("Om mig", "About");
+    var title = Model?.Title;
+    var body = Model?.Body;
+    ViewData["Title"] = "About";
 }
 
 <div class="page-header page-header--with-actions">
     <div>
-        <p class="page-eyebrow">@Lang.T("Om mig", "About")</p>
+        <p class="page-eyebrow">About</p>
         @* Use the saved heading, or a default when none is written *@
-        <h1>@(string.IsNullOrWhiteSpace(title) ? Lang.T("Om mig", "About me") : title)</h1>
-        @* The language is chosen with the SV | EN switch in the menu bar *@
+        <h1>@(string.IsNullOrWhiteSpace(title) ? "About me" : title)</h1>
+        @* Link to the CV page, below the headline *@
+        <a class="btn btn-primary page-header-btn" asp-controller="CV" asp-action="Index">View my CV →</a>
     </div>
     @* Framed image to the right of the headline (styles: .framed-image in site.css) *@
     <figure class="framed-image framed-image--landscape page-header-image">
         <img src="~/images/about.jpg" asp-append-version="true" width="760" height="633"
-             alt="@Lang.T("Bjarne med en kopp kaffe vid ett tält på klipporna, med solnedgång över havet", "Bjarne with a cup of coffee by a tent on the rocks, with the sun setting over the sea")" />
+             alt="Bjarne with a cup of coffee by a tent on the rocks, with the sun setting over the sea" />
     </figure>
 </div>
 
@@ -37,7 +34,7 @@
     <div class="empty-page empty-page--compact">
         <div class="empty-inner">
             <span class="empty-icon" aria-hidden="true">◉</span>
-            <p>@Lang.T("Kommer snart.", "Coming soon.")</p>
+            <p>Coming soon.</p>
         </div>
     </div>
 }
@@ -45,6 +42,6 @@ else
 {
     <article class="post-article post-article--page">
         @* Markdown.Render returns safe, already-cleaned HTML (see MarkdownRenderer.cs) *@
-        <div class="post-body prose page-card" lang="@contentLang">@Markdown.Render(body)</div>
+        <div class="post-body prose page-card">@Markdown.Render(body)</div>
     </article>
 }

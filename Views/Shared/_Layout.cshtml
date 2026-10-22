@@ -28,8 +28,8 @@
             ? "active" : "";
 }
 <!DOCTYPE html>
-@* lang="sv" or "en" helps screen readers pronounce the text correctly *@
-<html lang="@Lang.Code">
+@* lang="en" helps screen readers pronounce the text correctly *@
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     @* Makes the page fit phone screens instead of showing a zoomed-out desktop page *@
@@ -61,8 +61,8 @@
                 <li><a asp-area="" asp-controller="Stories" asp-action="Index" class="@ActiveIf("Stories")">Stories</a></li>
                 <li><a asp-area="" asp-controller="Projects" asp-action="Index" class="@ActiveIf("Projects")">Projects</a></li>
                 <li><a asp-area="" asp-controller="Portfolio" asp-action="Index" class="@ActiveIf("Portfolio")">Portfolio</a></li>
-                <li><a asp-area="" asp-controller="About" asp-action="Index" class="@ActiveIf("About")">About</a></li>
-                <li><a asp-area="" asp-controller="CV" asp-action="Index" class="@ActiveIf("CV")">CV</a></li>
+                @* The CV is reached from a button on the About page, so About stays marked there too *@
+                <li><a asp-area="" asp-controller="About" asp-action="Index" class="@(ActiveIf("About") + ActiveIf("CV"))">About</a></li>
                 @* The Admin link is only shown when you are logged in.
                    "User" is the current visitor, read from the login cookie. *@
                 @if (User.Identity?.IsAuthenticated == true)
@@ -70,8 +70,6 @@
                     <li><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-admin @(ViewContext.RouteData.Values["area"]?.ToString() == "Admin" ? "active" : "")">Admin</a></li>
                 }
             </ul>
-            @* The SV | EN switch, on every page (Views/Shared/_LangSwitch.cshtml) *@
-            <partial name="_LangSwitch" view-data='new ViewDataDictionary(ViewData) { ["Compact"] = true }' />
         </nav>
     </header>
 

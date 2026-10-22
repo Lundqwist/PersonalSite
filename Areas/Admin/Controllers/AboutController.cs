@@ -22,8 +22,8 @@ public class AboutController : AdminControllerBase
     // Allowed form fields (see Admin/CvController.cs for why this list exists).
     private static readonly Expression<Func<PageContent, object?>>[] EditableFields =
     {
-        p => p.Title, p => p.TitleSv,
-        p => p.Body, p => p.BodySv,
+        p => p.Title,
+        p => p.Body,
     };
 
     private readonly AppDbContext _db;
