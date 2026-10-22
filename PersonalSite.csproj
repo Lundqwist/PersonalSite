@@ -27,6 +27,14 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2" />
     <!-- Entity Framework Core: work with the database through C# classes -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+    <!-- Builds the downloadable CV PDF (Services/CvPdfBuilder.cs) — free Community license -->
+    <PackageReference Include="QuestPDF" Version="2026.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The Lato font for the CV PDF (SIL Open Font License, see Fonts/OFL.txt).
+         Copied next to the site, because the server has no fonts installed. -->
+    <None Include="Fonts\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

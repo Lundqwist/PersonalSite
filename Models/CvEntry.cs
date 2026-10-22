@@ -10,6 +10,7 @@
 // They tell EF Core how to build the columns AND tell the admin forms what
 // to validate (e.g. "Title must be filled in").
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 // A namespace groups related classes, like a folder for code.
 namespace PersonalSite.Models;
@@ -109,5 +110,18 @@ public class CvEntry
             // Split on line breaks; drop empty lines and surrounding spaces.
             // "|" combines the two options (they are "flags").
             : text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    // "Aug 2022 – Jun 2024" ("aug. 2022 – juni 2024" in Swedish), or the free
+    // text in DisplayDate when it is set (e.g. "1992 – 1994"), or
+    // "... – Present" for ongoing entries. Used by the CV page and the PDF.
+    public string GetDateRange(bool en)
+    {
+        if (!string.IsNullOrWhiteSpace(DisplayDate)) return DisplayDate;
+        var culture = CultureInfo.GetCultureInfo(en ? "en-US" : "sv-SE");
+        // "—" when there is no date
+        string Format(DateOnly? date) => date?.ToString("MMM yyyy", culture) ?? "—";
+        var end = IsCurrent ? (en ? "Present" : "pågående") : Format(EndDate);
+        return $"{Format(StartDate)} – {end}";
     }
 }

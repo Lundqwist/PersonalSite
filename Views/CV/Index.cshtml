@@ -9,7 +9,6 @@
     open when you hover over the card (done purely in CSS, see .cv-card-comment
     in site.css).
 *@
-@using System.Globalization
 @model Dictionary<CvEntryType, List<CvEntry>>
 @{
     // The CV can be read in English (default) or Swedish. The choice is in the
@@ -19,27 +18,7 @@
     // Picks the Swedish or English text, e.g. T("Kurser", "Courses")
     string T(string sv, string english) => en ? english : sv;
 
-    // Month names follow the chosen language: "Aug 2022" / "aug. 2022"
-    var culture = CultureInfo.GetCultureInfo(en ? "en-US" : "sv-SE");
-
     ViewData["Title"] = "CV";
-
-    // "—" when there is no date.
-    string FormatDate(DateOnly? date)
-    {
-        if (date == null) return "—";
-        return date.Value.ToString("MMM yyyy", culture);
-    }
-
-    // "Aug 2022 – Jun 2024", or the free text in DisplayDate when it is set
-    // (e.g. "1992 – 1994"), or "... – Present" for ongoing entries.
-    string FormatDateRange(CvEntry e)
-    {
-        if (!string.IsNullOrWhiteSpace(e.DisplayDate)) return e.DisplayDate;
-        var start = FormatDate(e.StartDate);
-        var end = e.IsCurrent ? T("pågående", "Present") : FormatDate(e.EndDate);
-        return $"{start} – {end}";
-    }
 
     // The sections in display order: (type, heading, icon).
     // Each item is a "tuple" — a small group of values without a named class.
@@ -57,14 +36,20 @@
         <p class="page-eyebrow">Portfolio</p>
         <h1>Curriculum Vitae</h1>
     </div>
-    @* The English | Svenska switch. aria-current marks the chosen language;
-       when its value is null, Razor leaves the attribute out. *@
-    <nav class="lang-switch" aria-label="@T("Språk", "Language")">
-        <a asp-controller="CV" asp-action="Index" class="@(en ? "active" : "")"
-           hreflang="en" lang="en" aria-current="@(en ? "true" : null)">English</a>
-        <a asp-controller="CV" asp-action="Index" asp-route-lang="sv" class="@(en ? "" : "active")"
-           hreflang="sv" lang="sv" aria-current="@(en ? null : "true")">Svenska</a>
-    </nav>
+    <div class="cv-actions">
+        @* The English | Svenska switch. aria-current marks the chosen language;
+           when its value is null, Razor leaves the attribute out. *@
+        <nav class="lang-switch" aria-label="@T("Språk", "Language")">
+            <a asp-controller="CV" asp-action="Index" class="@(en ? "active" : "")"
+               hreflang="en" lang="en" aria-current="@(en ? "true" : null)">English</a>
+            <a asp-controller="CV" asp-action="Index" asp-route-lang="sv" class="@(en ? "" : "active")"
+               hreflang="sv" lang="sv" aria-current="@(en ? null : "true")">Svenska</a>
+        </nav>
+        @* The CV as a PDF in the chosen language (CvController.Pdf) *@
+        <a class="btn btn-primary" asp-controller="CV" asp-action="Pdf" asp-route-lang="@(en ? "en" : "sv")">
+            @T("Ladda ner PDF", "Download PDF") ↓
+        </a>
+    </div>
 </div>
 @* Loop over the sections. "var (type, label, icon)" unpacks each tuple
    into three variables ("deconstruction"). *@
@@ -120,7 +105,7 @@
                             <span class="cv-meta-item">
                                 @* Calendar icon *@
                                 <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                @FormatDateRange(entry)
+                                @entry.GetDateRange(en)
                             </span>
                         </div>
                     </div>

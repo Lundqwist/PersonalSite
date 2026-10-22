@@ -677,6 +677,14 @@ ul { list-style: none; }
     justify-content: center;
 }
 
+/* The language switch and the PDF button next to the CV headline */
+.cv-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
 /* The English | Svenska switch on the CV page */
 .lang-switch {
     display: inline-flex;

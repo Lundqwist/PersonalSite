@@ -90,6 +90,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // because MarkdownRenderer keeps no per-visitor data). "Scoped" = one new
 // instance per web request (the database context is scoped).
 builder.Services.AddSingleton<MarkdownRenderer>();
+// Builds the CV PDF; a singleton so the fonts are registered only once
+builder.Services.AddSingleton<CvPdfBuilder>();
 
 // ── Admin login ──
 // PasswordHasher turns a password into a salted, slow-to-crack hash
