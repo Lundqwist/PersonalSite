@@ -107,6 +107,7 @@ ul { list-style: none; }
 /* Elements drawn on deep blue: switch text, accent and border colors so
    every rule inside them stays readable. */
 .cv-count,
+.lang-switch,
 .prose pre {
     --text: var(--on-surface);
     --text-muted: var(--on-surface-muted);
@@ -674,6 +675,37 @@ ul { list-style: none; }
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+/* The English | Svenska switch on the CV page */
+.lang-switch {
+    display: inline-flex;
+    padding: 0.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+}
+
+.lang-switch a {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.lang-switch a:hover { color: var(--text); }
+
+.lang-switch a.active {
+    background: var(--surface2);
+    color: var(--accent-lt);
+}
+
+.lang-switch a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 /* ── Empty pages ─────────────────────────────────────── */

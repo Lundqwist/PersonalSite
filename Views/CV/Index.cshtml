@@ -12,17 +12,23 @@
 @using System.Globalization
 @model Dictionary<CvEntryType, List<CvEntry>>
 @{
-    // The site is English only: show each entry's English text (see CvEntry.cs)
-    const bool en = true;
+    // The CV can be read in English (default) or Swedish. The choice is in the
+    // address, /CV?lang=sv, so no cookie is needed and the link can be shared.
+    var en = Context.Request.Query["lang"] != "sv";
+
+    // Picks the Swedish or English text, e.g. T("Kurser", "Courses")
+    string T(string sv, string english) => en ? english : sv;
+
+    // Month names follow the chosen language: "Aug 2022" / "aug. 2022"
+    var culture = CultureInfo.GetCultureInfo(en ? "en-US" : "sv-SE");
 
     ViewData["Title"] = "CV";
 
-    // e.g. "Aug 2022" (CultureInfo.CurrentCulture is en-US, see Program.cs).
     // "—" when there is no date.
     string FormatDate(DateOnly? date)
     {
         if (date == null) return "—";
-        return date.Value.ToString("MMM yyyy", CultureInfo.CurrentCulture);
+        return date.Value.ToString("MMM yyyy", culture);
     }
 
     // "Aug 2022 – Jun 2024", or the free text in DisplayDate when it is set
@@ -31,7 +37,7 @@
     {
         if (!string.IsNullOrWhiteSpace(e.DisplayDate)) return e.DisplayDate;
         var start = FormatDate(e.StartDate);
-        var end = e.IsCurrent ? "Present" : FormatDate(e.EndDate);
+        var end = e.IsCurrent ? T("pågående", "Present") : FormatDate(e.EndDate);
         return $"{start} – {end}";
     }
 
@@ -39,10 +45,10 @@
     // Each item is a "tuple" — a small group of values without a named class.
     var sections = new[]
     {
-        (CvEntryType.Workplace, "Workplaces",          "◈"),
-        (CvEntryType.Course,    "Courses",             "◇"),
-        (CvEntryType.School,    "Education",           "◆"),
-        (CvEntryType.Board,     "Boards & Committees", "◉"),
+        (CvEntryType.Workplace, T("Arbetsplatser", "Workplaces"),                  "◈"),
+        (CvEntryType.Course,    T("Kurser", "Courses"),                            "◇"),
+        (CvEntryType.School,    T("Utbildningar", "Education"),                    "◆"),
+        (CvEntryType.Board,     T("Styrelser & kommittéer", "Boards & Committees"), "◉"),
     };
 }
 
@@ -51,8 +57,15 @@
         <p class="page-eyebrow">Portfolio</p>
         <h1>Curriculum Vitae</h1>
     </div>
+    @* The English | Svenska switch. aria-current marks the chosen language;
+       when its value is null, Razor leaves the attribute out. *@
+    <nav class="lang-switch" aria-label="@T("Språk", "Language")">
+        <a asp-controller="CV" asp-action="Index" class="@(en ? "active" : "")"
+           hreflang="en" lang="en" aria-current="@(en ? "true" : null)">English</a>
+        <a asp-controller="CV" asp-action="Index" asp-route-lang="sv" class="@(en ? "" : "active")"
+           hreflang="sv" lang="sv" aria-current="@(en ? null : "true")">Svenska</a>
+    </nav>
 </div>
-
 @* Loop over the sections. "var (type, label, icon)" unpacks each tuple
    into three variables ("deconstruction"). *@
 @foreach (var (type, label, icon) in sections)
@@ -61,7 +74,8 @@
     if (!Model.ContainsKey(type)) continue;
     var entries = Model[type];
 
-    <section class="cv-section">
+    @* lang tells screen readers which language the section is in *@
+    <section class="cv-section" lang="@(en ? "en" : "sv")">
         <div class="cv-section-header">
             <span class="cv-section-icon" aria-hidden="true">@icon</span>
             <h2>@label</h2>
@@ -71,7 +85,8 @@
         <div class="cv-grid">
             @foreach (var entry in entries)
             {
-                // The English text, or the original when it has no translation (see CvEntry.cs)
+                // The chosen language's text; English falls back to Swedish when
+                // there is no translation (see CvEntry.cs)
                 var organization = entry.GetOrganization(en);
                 var location = entry.GetLocation(en);
                 var courses = entry.GetCourses(en);
@@ -90,7 +105,7 @@
                             </div>
                             @if (entry.IsCurrent)
                             {
-                                <span class="cv-badge">Current</span>
+                                <span class="cv-badge">@T("Pågående", "Current")</span>
                             }
                         </div>
                         <div class="cv-card-meta">
@@ -119,7 +134,7 @@
                                 {
                                     @* "Courses taught" for jobs, "Courses" for education *@
                                     <p class="cv-comment-label">
-                                        @(entry.Type == CvEntryType.Workplace ? "Courses taught" : "Courses")
+                                        @(entry.Type == CvEntryType.Workplace ? T("Undervisade kurser", "Courses taught") : T("Kurser", "Courses"))
                                     </p>
                                     <ul class="cv-course-list">
                                         @foreach (var course in courses)
@@ -130,7 +145,7 @@
                                 }
                                 @if (!string.IsNullOrWhiteSpace(comment))
                                 {
-                                    <p class="cv-comment-label">Notes</p>
+                                    <p class="cv-comment-label">@T("Anteckningar", "Notes")</p>
                                     @* Line breaks in the notes are kept by CSS (white-space: pre-line) *@
                                     <p class="cv-comment-text">@comment</p>
                                 }
