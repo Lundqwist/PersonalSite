@@ -21,6 +21,43 @@ public static class CvSeedData
     // new DateOnly(2022, 8, 1). "int day = 1" is an optional parameter.
     private static DateOnly D(int year, int month, int day = 1) => new(year, month, day);
 
+    // ── Profile summary and skills (migration CvProfile) ──────
+    // Stored as PageContents rows, see Models/CvProfile.cs. Skills: one group
+    // per line, "Label: item, item, item".
+    public const string SummaryEn =
+        "Teacher and developer with a background in IT operations, networks and game development. " +
+        "Since 2014 I have taught programming, web development and game development at upper secondary " +
+        "schools and a folk high school, and built and led vocational programmes such as Te4 and T4. " +
+        "Before teaching I worked in network operations at Skanova (Telia Sonera) and as an IT administrator, " +
+        "so I know what it takes to keep real systems running. My students have won awards at the Swedish " +
+        "Game Awards, and I was nominated for Sweden's Teacher of the Year in 2019 and 2022. " +
+        "I am currently studying full-stack C# .NET at Lexicon and C++ at YrkesAkademin.";
+
+    public const string SummarySv =
+        "Lärare och utvecklare med bakgrund inom IT-drift, nätverk och spelutveckling. " +
+        "Sedan 2014 har jag undervisat i programmering, webbutveckling och spelutveckling på gymnasier " +
+        "och folkhögskola, och byggt upp och lett yrkesutbildningar som Te4 och T4. " +
+        "Innan jag blev lärare arbetade jag med nätdrift på Skanova (Telia Sonera) och som IT-administratör, " +
+        "så jag vet vad som krävs för att hålla riktiga system igång. Mina elever har vunnit priser i " +
+        "Swedish Game Awards, och jag nominerades till årets lärare i Sverige 2019 och 2022. " +
+        "Just nu studerar jag fullstack C# .NET på Lexicon och C++ på YrkesAkademin.";
+
+    public const string SkillsEn =
+        "Programming: C#, .NET, ASP.NET Core, C++, HTML, CSS, JavaScript, SQL\n" +
+        "Game development: Game programming, Game design, 2D graphics, Animation, Digital creation\n" +
+        "IT & networks: Network operations, Troubleshooting (copper and fibre), IT administration, MS Exchange Server, Client support\n" +
+        "Teaching: Course and programme development, Programming and web courses, Supporting students with NPF\n" +
+        "Leadership: Group leadership, Board work, Event organisation (650+ participants)\n" +
+        "Languages: Swedish (native), English (fluent)";
+
+    public const string SkillsSv =
+        "Programmering: C#, .NET, ASP.NET Core, C++, HTML, CSS, JavaScript, SQL\n" +
+        "Spelutveckling: Spelprogrammering, Speldesign, 2D-grafik, Animation, Digitalt skapande\n" +
+        "IT & nätverk: Nätdrift, Felsökning (koppar och fiber), IT-administration, MS Exchange Server, Klientsupport\n" +
+        "Undervisning: Kurs- och utbildningsutveckling, Programmerings- och webbkurser, Stöd för elever med NPF\n" +
+        "Ledarskap: Gruppledarskap, Styrelsearbete, Eventarrangemang (650+ deltagare)\n" +
+        "Språk: Svenska (modersmål), Engelska (flytande)";
+
     // Names used several times, written once.
     private const string JU = "Jönköping University";
     private const string CampusGotland = "Uppsala Universitet - Campus Gotland";

@@ -45,7 +45,7 @@ public class CvPdfBuilder
     }
 
     // Returns the finished PDF file as bytes. "en" picks English or Swedish.
-    public byte[] Build(IReadOnlyList<CvEntry> entries, bool en)
+    public byte[] Build(IReadOnlyList<CvEntry> entries, CvProfile profile, bool en)
     {
         string T(string sv, string english) => en ? english : sv;
 
@@ -90,6 +90,28 @@ public class CvPdfBuilder
                         header.Item().PaddingTop(10).LineHorizontal(2).LineColor(Orange);
                     });
 
+                    // ── Profile summary ──
+                    if (!string.IsNullOrWhiteSpace(profile.Summary))
+                        column.Item().Text(profile.Summary).FontSize(10).LineHeight(1.45f);
+
+                    // ── Skills: the group label on the left, the skills on the right ──
+                    if (profile.Skills.Count > 0)
+                    {
+                        column.Item().ShowEntire().Column(skills =>
+                        {
+                            skills.Spacing(5);
+                            skills.Item().Element(c => Heading(c, T("Kompetenser", "Skills")));
+                            foreach (var group in profile.Skills)
+                            {
+                                skills.Item().Row(row =>
+                                {
+                                    row.ConstantItem(95).Text(group.Label ?? "").FontSize(8.5f).Bold().FontColor(Navy);
+                                    row.RelativeItem().Text(string.Join("  ·  ", group.Items)).FontSize(9);
+                                });
+                            }
+                        });
+                    }
+
                     // ── One block per section that has entries ──
                     foreach (var (type, heading) in sections)
                     {
@@ -105,11 +127,7 @@ public class CvPdfBuilder
                             section.Item().ShowEntire().Column(first =>
                             {
                                 first.Spacing(9);
-                                first.Item().Column(h =>
-                                {
-                                    h.Item().Text(heading.ToUpperInvariant()).FontSize(11).Bold().FontColor(Navy).LetterSpacing(0.08f);
-                                    h.Item().PaddingTop(3).LineHorizontal(0.75f).LineColor("#D5DCE6");
-                                });
+                                first.Item().Element(c => Heading(c, heading));
                                 first.Item().Element(c => Entry(c, items[0], en));
                             });
 
@@ -141,6 +159,16 @@ public class CvPdfBuilder
             Language = en ? "en-US" : "sv-SE",
         })
         .GeneratePdf();
+    }
+
+    // A section heading in capitals with a thin line under it.
+    private static void Heading(IContainer container, string heading)
+    {
+        container.Column(h =>
+        {
+            h.Item().Text(heading.ToUpperInvariant()).FontSize(11).Bold().FontColor(Navy).LetterSpacing(0.08f);
+            h.Item().PaddingTop(3).LineHorizontal(0.75f).LineColor("#D5DCE6");
+        });
     }
 
     // One CV entry: the dates on the left, the details on the right.

@@ -5,6 +5,7 @@
 //   GET  /Admin/Cv/Create        empty form          POST: save the new entry
 //   GET  /Admin/Cv/Edit/5        form for entry 5    POST: save the changes
 //   POST /Admin/Cv/Delete/5      delete entry 5
+//   GET  /Admin/Cv/Profile       profile summary + skills   POST: save them
 //
 // This is the classic "CRUD" pattern: Create, Read, Update, Delete.
 // ════════════════════════════════════════════════════════════════════════════
@@ -115,6 +116,53 @@ public class CvController : AdminControllerBase
 
         SetMessage($"Saved \"{entry.Title}\".");
         return RedirectToAction(nameof(Index));
+    }
+
+    // ── Profile summary and skills ──
+    // Two PageContents rows (see Models/CvProfile.cs). The form has plain
+    // fields, not a model, so the values are read by name; Body is English
+    // and BodySv Swedish.
+
+    // GET /Admin/Cv/Profile
+    [HttpGet]
+    public async Task<IActionResult> Profile()
+    {
+        var summary = await LoadPageAsync(PageContent.CvSummaryKey);
+        var skills = await LoadPageAsync(PageContent.CvSkillsKey);
+        ViewData["SummaryEn"] = summary?.Body;
+        ViewData["SummarySv"] = summary?.BodySv;
+        ViewData["SkillsEn"] = skills?.Body;
+        ViewData["SkillsSv"] = skills?.BodySv;
+        return View();
+    }
+
+    [HttpPost]
+    [ActionName("Profile")]
+    public async Task<IActionResult> ProfilePost(string? summaryEn, string? summarySv, string? skillsEn, string? skillsSv)
+    {
+        await SavePageAsync(PageContent.CvSummaryKey, summaryEn, summarySv);
+        await SavePageAsync(PageContent.CvSkillsKey, skillsEn, skillsSv);
+        await _db.SaveChangesAsync();
+
+        SetMessage("The profile and skills have been saved.");
+        return RedirectToAction(nameof(Index));
+    }
+
+    private Task<PageContent?> LoadPageAsync(string key) =>
+        _db.PageContents.FirstOrDefaultAsync(p => p.Key == key);
+
+    // Updates the row, or adds it the first time
+    private async Task SavePageAsync(string key, string? english, string? swedish)
+    {
+        var page = await LoadPageAsync(key);
+        if (page == null)
+        {
+            page = new PageContent { Key = key };
+            _db.PageContents.Add(page);
+        }
+        page.Body = english;
+        page.BodySv = swedish;
+        page.UpdatedAt = DateTime.UtcNow;
     }
 
     [HttpPost]

@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 2 of 7 — RealCvData: replaces the template's sample CV with the
+// MIGRATION 2 of 8 — RealCvData: replaces the template's sample CV with the
 // real CV (from Data/CvSeedData.cs), adds the DisplayDate column and makes
 // Organization optional. (See InitialCreate for what migrations are.)
 // ════════════════════════════════════════════════════════════════════════════

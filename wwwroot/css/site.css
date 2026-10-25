@@ -637,6 +637,55 @@ ul { list-style: none; }
 
 .cv-course-list:last-child { margin-bottom: 0; }
 
+/* ── Profile summary and skills ──────────────────────── */
+.cv-summary {
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 75ch;
+    margin-bottom: 1.75rem;
+}
+
+.cv-summary:last-child { margin-bottom: 0; }
+
+.cv-skills {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+}
+
+/* Label on the left, skills on the right; stacked on phones (see below) */
+.cv-skill-group {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.25rem 1rem;
+    align-items: baseline;
+}
+
+.cv-skill-group dt {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.cv-skill-group dd { margin: 0; }
+
+/* Each skill as a small pill */
+.cv-skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+}
+
+.cv-skill-list li {
+    font-size: 0.8rem;
+    background: var(--card-bg2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.15rem 0.7rem;
+}
+
 /* ── Language switch ─────────────────────────────────── */
 .page-header--with-actions {
     display: flex;
@@ -1756,7 +1805,8 @@ a.footer-item:focus-visible,
     }
 
     .cv-grid,
-    .post-list {
+    .post-list,
+    .cv-skill-group {
         grid-template-columns: 1fr;
     }
 

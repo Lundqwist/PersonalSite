@@ -1,0 +1,48 @@
+@*
+    Areas/Admin/Views/Cv/Profile.cshtml — the profile summary and skills shown at
+    the top of the CV. Swedish on the left, English on the right (empty English
+    = use Swedish). The values come from Admin/CvController.Profile in ViewData.
+*@
+@{
+    ViewData["Title"] = "Admin · CV profile";
+}
+
+<div class="admin-page">
+    <partial name="_AdminHeader" model="@("CV profile & skills")" />
+
+    <form method="post" asp-action="Profile" class="admin-form admin-card">
+        <fieldset class="form-langs">
+            <legend class="visually-hidden">Text</legend>
+            <div class="form-lang-head"><span>Svenska</span><span>English <small>(optional, falls back to Swedish)</small></span></div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="summarySv">Profile summary</label>
+                    <textarea id="summarySv" name="summarySv" rows="8">@ViewData["SummarySv"]</textarea>
+                    <span class="form-hint">A short paragraph at the top of the CV.</span>
+                </div>
+                <div class="form-field">
+                    <label for="summaryEn">Profile summary (English)</label>
+                    <textarea id="summaryEn" name="summaryEn" rows="8">@ViewData["SummaryEn"]</textarea>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="skillsSv">Skills (one group per line)</label>
+                    <textarea id="skillsSv" name="skillsSv" rows="8">@ViewData["SkillsSv"]</textarea>
+                    <span class="form-hint">Write "Group: skill, skill, skill", e.g. "Programmering: C#, .NET, C++".</span>
+                </div>
+                <div class="form-field">
+                    <label for="skillsEn">Skills (English, one group per line)</label>
+                    <textarea id="skillsEn" name="skillsEn" rows="8">@ViewData["SkillsEn"]</textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

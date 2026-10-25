@@ -42,6 +42,9 @@ public class CvController : Controller
             .GroupBy(e => e.Type)
             .ToDictionary(g => g.Key, g => g.ToList());
 
+        // The summary and skills go next to the model, in ViewData
+        ViewData["Profile"] = await LoadProfileAsync(Request.Query["lang"] != "sv");
+
         // Pass the dictionary to the view as its "Model".
         return View(grouped);
     }
@@ -50,7 +53,7 @@ public class CvController : Controller
     public async Task<IActionResult> Pdf(string? lang)
     {
         var en = lang != "sv";
-        var bytes = _pdf.Build(await LoadEntriesAsync(), en);
+        var bytes = _pdf.Build(await LoadEntriesAsync(), await LoadProfileAsync(en), en);
 
         // File(...) sends the bytes; the file name makes the browser download it
         return File(bytes, "application/pdf", en ? "Bjarne_Lundqwist_CV_EN.pdf" : "Bjarne_Lundqwist_CV_SV.pdf");
@@ -64,4 +67,16 @@ public class CvController : Controller
             .OrderBy(e => e.Type)
             .ThenBy(e => e.SortOrder)
             .ToListAsync();
+
+    // The two PageContents rows with the summary and skills (see CvProfile.cs)
+    private async Task<CvProfile> LoadProfileAsync(bool en)
+    {
+        var rows = await _db.PageContents
+            .Where(p => p.Key == PageContent.CvSummaryKey || p.Key == PageContent.CvSkillsKey)
+            .ToListAsync();
+        return CvProfile.From(
+            rows.FirstOrDefault(p => p.Key == PageContent.CvSummaryKey),
+            rows.FirstOrDefault(p => p.Key == PageContent.CvSkillsKey),
+            en);
+    }
 }

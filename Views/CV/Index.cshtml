@@ -20,6 +20,9 @@
 
     ViewData["Title"] = "CV";
 
+    // The summary and skills in the chosen language (CvController.LoadProfileAsync)
+    var profile = ViewData["Profile"] as CvProfile ?? new();
+
     // The sections in display order: (type, heading, icon).
     // Each item is a "tuple" — a small group of values without a named class.
     var sections = new[]
@@ -51,6 +54,48 @@
         </a>
     </div>
 </div>
+
+@* Profile summary and skills, edited on /Admin/Cv/Profile *@
+@if (!profile.IsEmpty)
+{
+    <section class="cv-section" lang="@(en ? "en" : "sv")">
+        <div class="cv-section-header">
+            <span class="cv-section-icon" aria-hidden="true">◎</span>
+            <h2>@T("Profil", "Profile")</h2>
+        </div>
+        <div class="page-card cv-profile">
+            @if (!string.IsNullOrWhiteSpace(profile.Summary))
+            {
+                <p class="cv-summary">@profile.Summary</p>
+            }
+            @if (profile.Skills.Count > 0)
+            {
+                <h3 class="cv-comment-label">@T("Kompetenser", "Skills")</h3>
+                @* A description list: each group label (dt) with its skills (dd) *@
+                <dl class="cv-skills">
+                    @foreach (var group in profile.Skills)
+                    {
+                        <div class="cv-skill-group">
+                            @if (group.Label != null)
+                            {
+                                <dt>@group.Label</dt>
+                            }
+                            <dd>
+                                <ul class="cv-skill-list">
+                                    @foreach (var skill in group.Items)
+                                    {
+                                        <li>@skill</li>
+                                    }
+                                </ul>
+                            </dd>
+                        </div>
+                    }
+                </dl>
+            }
+        </div>
+    </section>
+}
+
 @* Loop over the sections. "var (type, label, icon)" unpacks each tuple
    into three variables ("deconstruction"). *@
 @foreach (var (type, label, icon) in sections)
