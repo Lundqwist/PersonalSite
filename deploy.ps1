@@ -6,7 +6,7 @@
 #
 # What it does:
 #   1. "dotnet publish" builds a Release version of the site into a temp folder.
-#   2. Copies it to \\192.168.50.2\docker\personalsite\app (only changed files;
+#   2. Copies it to \\LUNARBASE\docker\personalsite\app (only changed files;
 #      files no longer in the build are removed).
 #   3. Copies docker-compose.yml next to it.
 # Afterwards, restart the container in DSM: Container Manager -> Project ->
@@ -18,7 +18,9 @@
 
 param(
     # The NAS folder that holds docker-compose.yml, .env, app/ and keys/
-    [string]$Target = '\\192.168.50.2\docker\personalsite'
+    # Uses the NAS name, not its IP: Windows keeps the share sign-in per server
+    # name, and the sign-in for the mapped Z: drive is for \\LUNARBASE.
+    [string]$Target = '\\LUNARBASE\docker\personalsite'
 )
 
 # Stop at the first error instead of continuing with a half-finished deploy

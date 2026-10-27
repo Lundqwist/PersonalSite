@@ -305,7 +305,7 @@ Visitor ──https──► DSM reverse proxy (lundqwist.se:443, Let's Encrypt)
                   MariaDB 10 package (192.168.50.2:3306)
 ```
 
-Files on the NAS, in `/volume1/docker/personalsite/` (`\\192.168.50.2\docker\personalsite`):
+Files on the NAS, in `/volume1/docker/personalsite/` (`\\LUNARBASE\docker\personalsite`, or `Z:\personalsite` with the mapped drive):
 
 | File / folder | Content |
 |---|---|
@@ -340,7 +340,7 @@ A folder on the NAS for files and small websites that you want to show or link
 to, for example a game you made or a downloadable PDF:
 
 ```
-\\192.168.50.2\docker\personalsite\showcase\
+\\LUNARBASE\docker\personalsite\showcase\
 ├── README.txt            short how-to
 ├── files\                downloads: PDFs, zips, images, builds …
 │     cv.pdf            → https://lundqwist.se/showcase/files/cv.pdf

@@ -40,5 +40,5 @@ services:
       # The published site, read-only inside the container
       - ./app:/app:ro
       - ./keys:/keys
-      # The showcase folder (put files there via \\192.168.50.2\docker\personalsite\showcase)
+      # The showcase folder (put files there via \\LUNARBASE\docker\personalsite\showcase)
       - ./showcase:/showcase:ro
