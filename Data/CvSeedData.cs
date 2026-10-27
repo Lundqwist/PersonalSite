@@ -7,7 +7,8 @@ namespace PersonalSite.Data;
 //
 // The text comes from Data/Bjarne_Lundqwist_CV.pdf, in Swedish with English
 // translations. The migrations RealCvData and CvTranslations copy these rows
-// into the database the first time they run.
+// into the database the first time they run. Education entries were corrected
+// against Ladok on 2026-10-27 (unfinished studies removed, credits added).
 //
 // IMPORTANT: after that, the database is the source of truth. Edit the CV on
 // the admin page (/Admin/Cv) — changing this file does NOT change the live CV.
@@ -48,7 +49,8 @@ public static class CvSeedData
         "IT & networks: Network operations, Troubleshooting (copper and fibre), IT administration, MS Exchange Server, Client support\n" +
         "Teaching: Course and programme development, Programming and web courses, Supporting students with NPF\n" +
         "Leadership: Group leadership, Board work, Event organisation (650+ participants)\n" +
-        "Languages: Swedish (native), English (fluent)";
+        "Languages: Swedish (native), English (fluent)\n" +
+        DrivingLicenceEn;
 
     public const string SkillsSv =
         "Programmering: C#, .NET, ASP.NET Core, C++, HTML, CSS, JavaScript, SQL\n" +
@@ -56,7 +58,12 @@ public static class CvSeedData
         "IT & nätverk: Nätdrift, Felsökning (koppar och fiber), IT-administration, MS Exchange Server, Klientsupport\n" +
         "Undervisning: Kurs- och utbildningsutveckling, Programmerings- och webbkurser, Stöd för elever med NPF\n" +
         "Ledarskap: Gruppledarskap, Styrelsearbete, Eventarrangemang (650+ deltagare)\n" +
-        "Språk: Svenska (modersmål), Engelska (flytande)";
+        "Språk: Svenska (modersmål), Engelska (flytande)\n" +
+        DrivingLicenceSv;
+
+    // Added to the live skills text by the migration CvDrivingLicence.
+    public const string DrivingLicenceEn = "Driving licence: Car (manual and automatic)";
+    public const string DrivingLicenceSv = "Körkort: Bil (manuell och automat)";
 
     // Names used several times, written once.
     private const string JU = "Jönköping University";
@@ -187,23 +194,20 @@ public static class CvSeedData
             StartDate = D(2025, 12), EndDate = D(2026, 4),
             Courses = "Service och bemötande\nLivsmedelshygien\nMatlagning 1",
             CoursesEn = "Customer Service\nFood Hygiene\nCooking 1" },
-        new() { Id = 20, Type = CvEntryType.School, SortOrder = 4,
-            Title = "Gymnasielärare inriktning Religion", TitleEn = "Upper Secondary Teacher Education, Religious Studies",
-            Organization = JU, Location = "Jönköping",
-            StartDate = D(2025, 8), EndDate = D(2025, 11) },
         new() { Id = 21, Type = CvEntryType.School, SortOrder = 5,
-            Title = "Speldesign - Programmering", TitleEn = "Game Design - Programming",
+            Title = "Speldesign - Programmering, 92,5 hp", TitleEn = "Game Design - Programming, 92.5 credits",
             Organization = CampusGotland, OrganizationEn = CampusGotlandEn, Location = "Visby",
             StartDate = D(2010, 8), EndDate = D(2013, 6),
-            Comment = "Elevassistent.", CommentEn = "Student assistant." },
+            Courses = "Introduktion till spelutveckling, 15 hp (VG)\nStort spelprojekt, 15 hp\nSpelprogrammering I, 7,5 hp\nMatematik för programmering och spelutveckling, 7,5 hp (VG)\nAvancerad speldesign, 7,5 hp\nLevel Design, 7,5 hp\nIntroduktion till spelanalys och design, 7,5 hp\nProduktionsmetodik för spel, 7,5 hp\nTheme Park, 7,5 hp\nAtt kommunicera i tal och skrift, 7,5 hp",
+            CoursesEn = "Introduction to Game Development, 15 credits (with distinction)\nLarge Game Project, 15 credits\nGame Programming I, 7.5 credits\nMathematics for Programming and Game Development, 7.5 credits (with distinction)\nAdvanced Game Design, 7.5 credits\nLevel Design, 7.5 credits\nIntroduction to Game Analysis and Design, 7.5 credits\nProduction Methods for Games, 7.5 credits\nTheme Park, 7.5 credits\nCommunicating in Speech and Writing, 7.5 credits",
+            Comment = "92,5 hp avklarade inom speldesign och programmering, ingen examen (examensarbetet ej genomfört).\n\nArbetade extra som elevassistent.",
+            CommentEn = "Completed 92.5 credits in game design and programming; no degree (thesis not completed).\n\nWorked extra as a student assistant." },
         new() { Id = 22, Type = CvEntryType.School, SortOrder = 6,
-            Title = "Data/IT Systemutveckling", TitleEn = "Computer Science / IT Systems Development",
+            Title = "Data/IT Systemutveckling – Högskoleexamen 120 hp", TitleEn = "Computer Science / IT Systems Development – Higher Education Diploma, 120 credits",
             Organization = JU, Location = "Jönköping",
-            StartDate = D(2003, 8), EndDate = D(2006, 6) },
-        new() { Id = 23, Type = CvEntryType.School, SortOrder = 7,
-            Title = "Husbyggnadsingenjör, Engelska 30hp", TitleEn = "Building Engineering, English 30 credits",
-            Organization = JU, Location = "Jönköping",
-            StartDate = D(2001, 8), EndDate = D(2002, 6) },
+            StartDate = D(2003, 8), EndDate = D(2006, 6),
+            Comment = "Högskoleexamen (120 hp) utfärdad 2013-12-13, baserad på studier i datateknik och IT-systemutveckling: bl.a. programmering, objektorienterad analys och design, datastrukturer och algoritmer, operativsystem, datanät och datasäkerhet.",
+            CommentEn = "Higher Education Diploma (Högskoleexamen, 120 credits) awarded 2013-12-13, based on studies in computer engineering and IT systems development, including programming, object-oriented analysis and design, data structures and algorithms, operating systems, computer networks and IT security." },
         new() { Id = 24, Type = CvEntryType.School, SortOrder = 8,
             Title = "Tekniskt basår", TitleEn = "Technical Foundation Year",
             Organization = JU, Location = "Jönköping",
@@ -221,10 +225,10 @@ public static class CvSeedData
         new() { Id = 27, Type = CvEntryType.Course, SortOrder = 1,
             Title = "Båtförarutbildning (Yachtmaster diploma)", TitleEn = "Boat Handling Training (Yachtmaster diploma)",
             StartDate = D(2024, 6), EndDate = D(2025, 8) },
-        new() { Id = 28, Type = CvEntryType.Course, SortOrder = 2,
-            Title = "Psykologi 30hp", TitleEn = "Psychology 30 credits",
-            Organization = JU,
-            StartDate = D(2013, 8), EndDate = D(2014, 1) },
+        new() { Id = 43, Type = CvEntryType.Course, SortOrder = 2,
+            Title = "Strukturerad programmering med C++, 7,5 hp", TitleEn = "Structured Programming with C++, 7.5 credits",
+            Organization = "Linnéuniversitetet", OrganizationEn = "Linnaeus University",
+            StartDate = D(2011, 11, 14), DisplayDate = "2011-11-14" },
         new() { Id = 29, Type = CvEntryType.Course, SortOrder = 3,
             Title = "MC-körkort A (Tung Motorcykel)", TitleEn = "Motorcycle Licence A (Heavy Motorcycle)",
             StartDate = D(2009, 1), EndDate = D(2009, 11) },

@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 5 of 8 — MediaImages: creates the table for uploaded images and
+// MIGRATION 5 of 9 — MediaImages: creates the table for uploaded images and
 // adds Posts.CoverImageId, a "foreign key" pointing to an image. If that image
 // is deleted, the post's CoverImageId is set to NULL (ReferentialAction.SetNull).
 // ════════════════════════════════════════════════════════════════════════════

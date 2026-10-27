@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 3 of 8 — CvTranslations: adds the English columns (TitleEn,
+// MIGRATION 3 of 9 — CvTranslations: adds the English columns (TitleEn,
 // OrganizationEn, LocationEn, CommentEn) and the course lists (Courses,
 // CoursesEn) to the CV, then reloads all CV rows from Data/CvSeedData.cs.
 // ════════════════════════════════════════════════════════════════════════════

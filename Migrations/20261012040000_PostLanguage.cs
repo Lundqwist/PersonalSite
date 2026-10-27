@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 6 of 8 — PostLanguage: posts become single-language.
+// MIGRATION 6 of 9 — PostLanguage: posts become single-language.
 // Adds the Language column ("sv"/"en"), copies any English text into separate
 // English posts (so nothing was lost), then removes the old *En columns.
 // migrationBuilder.Sql(...) runs a hand-written SQL statement.

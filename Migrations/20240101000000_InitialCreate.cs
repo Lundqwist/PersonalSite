@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 1 of 8 — InitialCreate: creates the CvEntries table.
+// MIGRATION 1 of 9 — InitialCreate: creates the CvEntries table.
 //
 // What is a migration?
 //   A migration is one step in the history of the database's structure.
