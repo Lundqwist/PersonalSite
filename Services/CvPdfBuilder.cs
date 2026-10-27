@@ -64,12 +64,12 @@ public class CvPdfBuilder
             {
                 page.Size(PageSizes.A4);
                 page.MarginHorizontal(2, Unit.Centimetre);
-                page.MarginVertical(1.6f, Unit.Centimetre);
-                page.DefaultTextStyle(x => x.FontFamily("Lato").FontSize(9.5f).FontColor(TextColor).LineHeight(1.3f));
+                page.MarginVertical(1.3f, Unit.Centimetre);
+                page.DefaultTextStyle(x => x.FontFamily("Lato").FontSize(9.5f).FontColor(TextColor).LineHeight(1.25f));
 
                 page.Content().Column(column =>
                 {
-                    column.Spacing(14);
+                    column.Spacing(11);
 
                     // ── Name and contact details ──
                     column.Item().Column(header =>
@@ -92,7 +92,7 @@ public class CvPdfBuilder
 
                     // ── Profile summary ──
                     if (!string.IsNullOrWhiteSpace(profile.Summary))
-                        column.Item().Text(profile.Summary).FontSize(10).LineHeight(1.45f);
+                        column.Item().Text(profile.Summary).FontSize(10).LineHeight(1.35f);
 
                     // ── Skills: the group label on the left, the skills on the right ──
                     if (profile.Skills.Count > 0)
@@ -120,13 +120,13 @@ public class CvPdfBuilder
 
                         column.Item().Column(section =>
                         {
-                            section.Spacing(9);
+                            section.Spacing(7);
 
                             // The heading is kept on the same page as the first entry
                             // (ShowEntire), so it is never left alone at the bottom of a page
                             section.Item().ShowEntire().Column(first =>
                             {
-                                first.Spacing(9);
+                                first.Spacing(7);
                                 first.Item().Element(c => Heading(c, heading));
                                 first.Item().Element(c => Entry(c, items[0], en));
                             });
