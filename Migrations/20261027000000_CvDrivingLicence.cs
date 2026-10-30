@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 9 of 9 — CvDrivingLicence: adds a driving licence line to the end of
+// MIGRATION 9 of 10 — CvDrivingLicence: adds a driving licence line to the end of
 // the CV skills (PageContents row "CvSkills", text from Data/CvSeedData.cs).
 // Appends instead of overwriting, so edits made on /Admin/Cv/Profile are kept.
 // No table changes.

@@ -44,21 +44,21 @@ public static class CvSeedData
         "Just nu studerar jag fullstack C# .NET på Lexicon och C++ på YrkesAkademin.";
 
     public const string SkillsEn =
-        "Programming: C#, .NET, ASP.NET Core, C++, HTML, CSS, JavaScript, SQL\n" +
+        "Programming: C#, .NET, ASP.NET Core, Entity Framework Core, C++, Unity, HTML, CSS, JavaScript, SQL, MariaDB/MySQL, Git\n" +
         "Game development: Game programming, Game design, 2D graphics, Animation, Digital creation\n" +
-        "IT & networks: Network operations, Troubleshooting (copper and fibre), IT administration, MS Exchange Server, Client support\n" +
-        "Teaching: Course and programme development, Programming and web courses, Supporting students with NPF\n" +
+        "IT & networks: Network operations, Troubleshooting (copper and fibre), IT administration, MS Exchange Server, Client support, Linux, Docker, Self-hosting on Synology NAS and Raspberry Pi, WireGuard VPN, Pi-hole DNS\n" +
+        "Teaching: Course and programme development, Programming and web courses, Supporting students with NPF, Generative AI in teaching\n" +
         "Leadership: Group leadership, Board work, Event organisation (650+ participants)\n" +
-        "Languages: Swedish (native), English (fluent)\n" +
+        "Languages: Swedish (native), English (CEFR C1)\n" +
         DrivingLicenceEn;
 
     public const string SkillsSv =
-        "Programmering: C#, .NET, ASP.NET Core, C++, HTML, CSS, JavaScript, SQL\n" +
+        "Programmering: C#, .NET, ASP.NET Core, Entity Framework Core, C++, Unity, HTML, CSS, JavaScript, SQL, MariaDB/MySQL, Git\n" +
         "Spelutveckling: Spelprogrammering, Speldesign, 2D-grafik, Animation, Digitalt skapande\n" +
-        "IT & nätverk: Nätdrift, Felsökning (koppar och fiber), IT-administration, MS Exchange Server, Klientsupport\n" +
-        "Undervisning: Kurs- och utbildningsutveckling, Programmerings- och webbkurser, Stöd för elever med NPF\n" +
+        "IT & nätverk: Nätdrift, Felsökning (koppar och fiber), IT-administration, MS Exchange Server, Klientsupport, Linux, Docker, Egen drift på Synology NAS och Raspberry Pi, WireGuard VPN, Pi-hole DNS\n" +
+        "Undervisning: Kurs- och utbildningsutveckling, Programmerings- och webbkurser, Stöd för elever med NPF, Generativ AI i undervisningen\n" +
         "Ledarskap: Gruppledarskap, Styrelsearbete, Eventarrangemang (650+ deltagare)\n" +
-        "Språk: Svenska (modersmål), Engelska (flytande)\n" +
+        "Språk: Svenska (modersmål), Engelska (CEFR C1)\n" +
         DrivingLicenceSv;
 
     // Added to the live skills text by the migration CvDrivingLicence.

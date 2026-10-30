@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 4 of 9 — AdminAndPosts: creates the tables Posts (stories,
+// MIGRATION 4 of 10 — AdminAndPosts: creates the tables Posts (stories,
 // projects, portfolio), PageContents (the About page) and AdminUsers, and
 // adds the admin account "lunarAdmin".
 //

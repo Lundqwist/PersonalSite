@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 8 of 9 — CvProfile: adds the CV's profile summary and skills as two
+// MIGRATION 8 of 10 — CvProfile: adds the CV's profile summary and skills as two
 // PageContents rows (text from Data/CvSeedData.cs). No table changes.
 // ════════════════════════════════════════════════════════════════════════════
 using Microsoft.EntityFrameworkCore.Infrastructure;
