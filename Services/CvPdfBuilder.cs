@@ -10,6 +10,7 @@
 // font files in Fonts/ are copied next to the site and registered here.
 // ════════════════════════════════════════════════════════════════════════════
 
+using System.Text.RegularExpressions;
 using PersonalSite.Models;
 using QuestPDF.Drawing;
 using QuestPDF.Fluent;
@@ -242,8 +243,9 @@ public class CvPdfBuilder
                     });
                 }
 
+                // Blank lines between paragraphs are dropped in the PDF to save space
                 if (!string.IsNullOrWhiteSpace(comment))
-                    details.Item().PaddingTop(2).Text(comment.Trim()).FontSize(8.5f).FontColor(Muted);
+                    details.Item().PaddingTop(2).Text(Regex.Replace(comment.Trim(), @"(\r?\n\s*){2,}", "\n")).FontSize(8.5f).FontColor(Muted);
             });
         });
     }
