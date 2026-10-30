@@ -118,24 +118,25 @@ public class CvPdfBuilder
                         var items = entries.Where(e => e.Type == type).OrderBy(e => e.SortOrder).ToList();
                         if (items.Count == 0) continue;
 
-                        // An employer (e.g. AcadeMedia) and its workplaces form one group
-                        var groups = CvEntry.GroupByEmployer(items);
+                        // An employer (e.g. AcadeMedia) and its workplaces form one group;
+                        // each group is split into blocks that may go on different pages
+                        var blocks = CvEntry.GroupByEmployer(items).SelectMany(g => Blocks(g, en)).ToList();
 
                         column.Item().Column(section =>
                         {
                             section.Spacing(7);
 
-                            // The heading is kept on the same page as the first entry
+                            // The heading is kept on the same page as the first block
                             // (ShowEntire), so it is never left alone at the bottom of a page
                             section.Item().ShowEntire().Column(first =>
                             {
                                 first.Spacing(7);
                                 first.Item().Element(c => Heading(c, heading));
-                                first.Item().Element(c => Group(c, groups[0], en));
+                                first.Item().Element(blocks[0]);
                             });
 
-                            foreach (var group in groups.Skip(1))
-                                section.Item().Element(c => Group(c, group, en));
+                            foreach (var block in blocks.Skip(1))
+                                section.Item().Element(block);
                         });
                     }
                 });
@@ -174,33 +175,29 @@ public class CvPdfBuilder
         });
     }
 
-    // A single entry, or an employer: its name and full date range, with its
-    // workplaces beneath behind an orange line on the left.
-    private static void Group(IContainer container, CvEntryGroup group, bool en)
+    // The blocks a group is drawn as. A single entry is one block. An employer
+    // is its name and full date range together with its first workplace, then
+    // one block per further workplace; the workplaces sit behind an orange line.
+    private static IEnumerable<Action<IContainer>> Blocks(CvEntryGroup group, bool en)
     {
         if (!group.IsEmployer)
         {
-            Entry(container, group.Entries[0], en);
-            return;
+            yield return c => Entry(c, group.Entries[0], en);
+            yield break;
         }
 
-        container.Column(employer =>
+        yield return c => c.ShowEntire().Column(first =>
         {
-            employer.Spacing(5);
-            // Keep the employer name together with its first workplace
-            employer.Item().ShowEntire().Column(first =>
+            first.Spacing(5);
+            first.Item().Row(row =>
             {
-                first.Spacing(5);
-                first.Item().Row(row =>
-                {
-                    row.ConstantItem(95).Text(group.GetDateRange(en)).FontSize(8.5f).FontColor(Muted);
-                    row.RelativeItem().Text(group.Employer).FontSize(11.5f).Bold().FontColor(Navy);
-                });
-                first.Item().Element(c => Workplace(c, group.Entries[0], en));
+                row.ConstantItem(95).Text(group.GetDateRange(en)).FontSize(8.5f).FontColor(Muted);
+                row.RelativeItem().Text(group.Employer).FontSize(11.5f).Bold().FontColor(Navy);
             });
-            foreach (var entry in group.Entries.Skip(1))
-                employer.Item().Element(c => Workplace(c, entry, en));
+            first.Item().Element(w => Workplace(w, group.Entries[0], en));
         });
+        foreach (var entry in group.Entries.Skip(1))
+            yield return c => Workplace(c, entry, en);
     }
 
     // A workplace inside an employer group, indented behind an orange line
