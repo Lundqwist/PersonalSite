@@ -27,7 +27,7 @@ public class CvController : AdminControllerBase
     private static readonly Expression<Func<CvEntry, object?>>[] EditableFields =
     {
         e => e.Type, e => e.Title, e => e.TitleEn,
-        e => e.Organization, e => e.OrganizationEn,
+        e => e.Organization, e => e.OrganizationEn, e => e.Employer,
         e => e.Location, e => e.LocationEn,
         e => e.StartDate, e => e.EndDate, e => e.DisplayDate, e => e.IsCurrent,
         e => e.Courses, e => e.CoursesEn,

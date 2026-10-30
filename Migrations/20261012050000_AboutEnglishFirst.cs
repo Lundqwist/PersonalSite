@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 7 of 10 — AboutEnglishFirst: the About page becomes English-first.
+// MIGRATION 7 of 11 — AboutEnglishFirst: the About page becomes English-first.
 // Only renames columns (Title -> TitleSv, TitleEn -> Title, and the same for
 // Body), so existing text keeps its language.
 // ════════════════════════════════════════════════════════════════════════════

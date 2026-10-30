@@ -489,6 +489,32 @@ ul { list-style: none; }
     align-items: start;
 }
 
+/* One employer (e.g. AcadeMedia) with its workplaces as cards inside.
+   grid-column: 1 / -1 makes the box span the whole row of the outer grid. */
+.cv-employer {
+    grid-column: 1 / -1;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+}
+
+.cv-employer-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.cv-employer-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
 /* ── CV Card with hover-reveal comment ───────────────── */
 .cv-card {
     background: var(--surface);

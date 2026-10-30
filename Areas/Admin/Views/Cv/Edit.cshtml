@@ -112,6 +112,12 @@
         </div>
 
         <div class="form-field">
+            <label asp-for="Employer">Employer group (optional)</label>
+            <input asp-for="Employer" />
+            <span class="form-hint">e.g. "AcadeMedia". Workplaces next to each other with the same group are shown under one employer.</span>
+        </div>
+
+        <div class="form-field">
             <label asp-for="DisplayDate">Date text (optional)</label>
             <input asp-for="DisplayDate" />
             <span class="form-hint">Shown instead of the dates, e.g. "1992 – 1994" or "1999-10-16".</span>

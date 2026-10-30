@@ -62,8 +62,8 @@ public static class CvSeedData
         DrivingLicenceSv;
 
     // Added to the live skills text by the migration CvDrivingLicence.
-    public const string DrivingLicenceEn = "Driving licence: Car (manual and automatic)";
-    public const string DrivingLicenceSv = "Körkort: Bil (manuell och automat)";
+    public const string DrivingLicenceEn = "Driving licence: Car (manual and automatic), Motorcycle (A)";
+    public const string DrivingLicenceSv = "Körkort: Bil (manuell och automat), Motorcykel (A)";
 
     // Names used several times, written once.
     private const string JU = "Jönköping University";

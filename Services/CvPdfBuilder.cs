@@ -118,6 +118,9 @@ public class CvPdfBuilder
                         var items = entries.Where(e => e.Type == type).OrderBy(e => e.SortOrder).ToList();
                         if (items.Count == 0) continue;
 
+                        // An employer (e.g. AcadeMedia) and its workplaces form one group
+                        var groups = CvEntry.GroupByEmployer(items);
+
                         column.Item().Column(section =>
                         {
                             section.Spacing(7);
@@ -128,11 +131,11 @@ public class CvPdfBuilder
                             {
                                 first.Spacing(7);
                                 first.Item().Element(c => Heading(c, heading));
-                                first.Item().Element(c => Entry(c, items[0], en));
+                                first.Item().Element(c => Group(c, groups[0], en));
                             });
 
-                            foreach (var entry in items.Skip(1))
-                                section.Item().Element(c => Entry(c, entry, en));
+                            foreach (var group in groups.Skip(1))
+                                section.Item().Element(c => Group(c, group, en));
                         });
                     }
                 });
@@ -170,6 +173,39 @@ public class CvPdfBuilder
             h.Item().PaddingTop(3).LineHorizontal(0.75f).LineColor("#D5DCE6");
         });
     }
+
+    // A single entry, or an employer: its name and full date range, with its
+    // workplaces beneath behind an orange line on the left.
+    private static void Group(IContainer container, CvEntryGroup group, bool en)
+    {
+        if (!group.IsEmployer)
+        {
+            Entry(container, group.Entries[0], en);
+            return;
+        }
+
+        container.Column(employer =>
+        {
+            employer.Spacing(5);
+            // Keep the employer name together with its first workplace
+            employer.Item().ShowEntire().Column(first =>
+            {
+                first.Spacing(5);
+                first.Item().Row(row =>
+                {
+                    row.ConstantItem(95).Text(group.GetDateRange(en)).FontSize(8.5f).FontColor(Muted);
+                    row.RelativeItem().Text(group.Employer).FontSize(11.5f).Bold().FontColor(Navy);
+                });
+                first.Item().Element(c => Workplace(c, group.Entries[0], en));
+            });
+            foreach (var entry in group.Entries.Skip(1))
+                employer.Item().Element(c => Workplace(c, entry, en));
+        });
+    }
+
+    // A workplace inside an employer group, indented behind an orange line
+    private static void Workplace(IContainer container, CvEntry entry, bool en) =>
+        Entry(container.PaddingLeft(6).BorderLeft(1.5f).BorderColor(Orange).PaddingLeft(8), entry, en);
 
     // One CV entry: the dates on the left, the details on the right.
     private static void Entry(IContainer container, CvEntry entry, bool en)

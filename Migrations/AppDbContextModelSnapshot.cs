@@ -56,6 +56,10 @@ partial class AppDbContextModelSnapshot : ModelSnapshot
                 .HasMaxLength(100)
                 .HasColumnType("varchar(100)");
 
+            b.Property<string>("Employer")
+                .HasMaxLength(200)
+                .HasColumnType("varchar(200)");
+
             b.Property<DateOnly?>("EndDate")
                 .HasColumnType("date");
 

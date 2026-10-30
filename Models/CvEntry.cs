@@ -54,6 +54,12 @@ public class CvEntry
     [MaxLength(200)]
     public string? OrganizationEn { get; set; }
 
+    // The group an employer belongs to, e.g. "AcadeMedia" for its schools.
+    // Workplaces next to each other with the same Employer are shown as one
+    // employer with the schools/offices beneath it (see GroupByEmployer).
+    [MaxLength(200)]
+    public string? Employer { get; set; }
+
     [MaxLength(200)]
     public string? Location { get; set; }
 
@@ -115,13 +121,47 @@ public class CvEntry
     // "Aug 2022 – Jun 2024" ("aug. 2022 – juni 2024" in Swedish), or the free
     // text in DisplayDate when it is set (e.g. "1992 – 1994"), or
     // "... – Present" for ongoing entries. Used by the CV page and the PDF.
-    public string GetDateRange(bool en)
+    public string GetDateRange(bool en) =>
+        !string.IsNullOrWhiteSpace(DisplayDate) ? DisplayDate : FormatRange(StartDate, EndDate, IsCurrent, en);
+
+    // "Aug 2016 – Jun 2024": shared by single entries and employer groups
+    public static string FormatRange(DateOnly? start, DateOnly? end, bool current, bool en)
     {
-        if (!string.IsNullOrWhiteSpace(DisplayDate)) return DisplayDate;
         var culture = CultureInfo.GetCultureInfo(en ? "en-US" : "sv-SE");
         // "—" when there is no date
         string Format(DateOnly? date) => date?.ToString("MMM yyyy", culture) ?? "—";
-        var end = IsCurrent ? (en ? "Present" : "pågående") : Format(EndDate);
-        return $"{Format(StartDate)} – {end}";
+        var endText = current ? (en ? "Present" : "pågående") : Format(end);
+        return $"{Format(start)} – {endText}";
     }
+
+    // Splits a section's entries (already in display order) into groups:
+    // entries next to each other with the same Employer form one group, every
+    // other entry is a group of its own. Used by the CV page and the PDF.
+    public static List<CvEntryGroup> GroupByEmployer(IEnumerable<CvEntry> entries)
+    {
+        var groups = new List<CvEntryGroup>();
+        foreach (var entry in entries)
+        {
+            var last = groups.LastOrDefault();
+            if (last?.Employer != null && last.Employer == entry.Employer)
+                last.Entries.Add(entry);
+            else
+                groups.Add(new CvEntryGroup(string.IsNullOrWhiteSpace(entry.Employer) ? null : entry.Employer, new List<CvEntry> { entry }));
+        }
+        return groups;
+    }
+}
+
+// One employer and its workplaces, or a single entry (Employer null).
+public record CvEntryGroup(string? Employer, List<CvEntry> Entries)
+{
+    // Shown as a group heading only when it has an employer
+    public bool IsEmployer => Employer != null;
+
+    // From the earliest start to the latest end ("Present" if one is ongoing)
+    public string GetDateRange(bool en) => CvEntry.FormatRange(
+        Entries.Min(e => e.StartDate),
+        Entries.Max(e => e.EndDate),
+        Entries.Any(e => e.IsCurrent),
+        en);
 }

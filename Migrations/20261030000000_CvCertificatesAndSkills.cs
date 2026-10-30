@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════════
-// MIGRATION 10 of 10 — CvCertificatesAndSkills: adds three certificates to the
+// MIGRATION 10 of 11 — CvCertificatesAndSkills: adds three certificates to the
 // CV courses (AI in teaching, GDPR, English test), adds Unity, EF Core, Git,
 // Linux, Docker and self-hosting to the skills, gives English its CEFR level,
 // and turns the Swedish Louis Gibeck notes into bullets like the English ones.
